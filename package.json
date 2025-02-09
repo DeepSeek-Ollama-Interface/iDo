@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "dev": "NODE_ENV=development concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
-    "dev:win": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "dev": "npm run build && NODE_ENV=development concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "dev:win": "npm run build && concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "build": "vite build",
     "preview": "vite preview",
     "dist:linux": "npm run build && electron-packager . iDo --platform=linux --arch=x64 --out=dist/ --overwrite --icon=./build/icons/icon.png",
