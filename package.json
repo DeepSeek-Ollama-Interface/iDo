@@ -11,7 +11,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "dist:linux": "npm run build && electron-builder --linux AppImage",
-    "dist:win": "npm run build && electron-builder --win nsis",
+    "dist:win": "electron-packager . iDO --platform=win32 --arch=x64 --out=dist/ --overwrite",
     "dist:all": "npm run build && electron-builder --win nsis --linux AppImage"
   },
   "dependencies": {
