@@ -2,7 +2,6 @@ import { startProcess, readStdout, readStderr, killProcess } from './child_proce
 
 export async function runOllama() {
     try {
-        // const command = process.platform === 'win32' ? 'ollama' : 'ollama';
         const command = 'ollama';
         const args = ['serve'];
         const options = { cwd: process.cwd() };
@@ -19,8 +18,7 @@ export async function runOllama() {
 
         const stderr = readStderr(pid);
         stderr.on('data', (data) => {
-            console.error(`STDERR: ${data}`);
-            
+            throw new Error(`Failed to start Ollama: ${error.message}`);
         });
 
         process.on('SIGINT', async () => {
@@ -29,8 +27,9 @@ export async function runOllama() {
             process.exit();
         });
 
+        return pid;
     } catch (error) {
-        console.error(`Error: ${error.message}`);
+        throw new Error(`Failed to start Ollama: ${error.message}`);
     }
 }
 
