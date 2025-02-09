@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+@plugin "daisyui";
+
+:root {
+  font-family: 'Noto Sans', sans-serif;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  padding: 0;
+  margin: 0;
+  background: linear-gradient(to bottom, #000121, #00315c);
+  color: #dae1fb;
+}
+
+body {
+  color: rgb(var(--text));
+  background: rgb(var(--background));
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+  
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none; 
+}
+
+.titleBarColor {
+  background-color: #000121;
+}
+
+.sendMsgColor {
+  background-color: #02427a;
+}
