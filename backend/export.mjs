@@ -20,6 +20,7 @@ export async function runOllama() {
         const stderr = readStderr(pid);
         stderr.on('data', (data) => {
             console.error(`STDERR: ${data}`);
+            
         });
 
         process.on('SIGINT', async () => {

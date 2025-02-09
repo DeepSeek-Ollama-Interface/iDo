@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 const ms = require('ms');
 const gh = require('github-url-to-object');
