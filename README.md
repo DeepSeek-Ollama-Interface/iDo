@@ -66,16 +66,11 @@ cd ..
 To compile and run the project locally, use the following command:
 
 ```bash
-npm run dev:win
+npm run build
+npm run dist:win
 ```
 
-or if you're using linux:
-
-```bash
-npm run dev
-```
-
-This will start the application and open the Deepseek Interface window.
+This will build the application in dist folder.
 
 ---
 
