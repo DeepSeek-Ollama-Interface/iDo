@@ -1,4 +1,5 @@
 # Ollama Deepseek Interface
+# OFFLINE A.I. 100% Privacy
 
 [![Windows](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/windows.png?raw=true)](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/Release/iDo-windows-x86-64.zip) 
 [![Linux](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/linux.png?raw=true)](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/Release/iDo-linux-x64.zip) 
