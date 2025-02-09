@@ -1,7 +1,7 @@
 # Ollama Deepseek Interface
 
-[![Windows](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/windows.png?raw=true){:width="100"}](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/Release/iDo-windows-x86-64.zip) 
-[![Linux](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/linux.png?raw=true){:width="100"}](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/Release/iDo-linux-x64.zip) 
+[![Windows](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/windows.png?raw=true)](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/Release/iDo-windows-x86-64.zip) 
+[![Linux](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/linux.png?raw=true)](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/Release/iDo-linux-x64.zip) 
 
 **Ollama Deepseek Interface** is a powerful and intuitive desktop application that allows you to run **Deepseek-r1** locally on your PC. This interface enables you to access and manage your files effortlessly, while also providing you with an advanced **voice assistant** feature for smoother interaction. All functionality is optimized to ensure a seamless experience for users.
 
