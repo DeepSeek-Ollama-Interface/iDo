@@ -251,7 +251,7 @@ app.whenReady().then(() => {
   updateElectronApp({
     updateSource: {
       type: UpdateSourceType.ElectronPublicUpdateService,
-      repo: 'OxiJenuuu/deepseek-ollama-interface.git',
+      repo: 'DeepSeek-Ollama-Interface/iDo.git',
       host: 'https://github.com/'
     },
     updateInterval: '10 minutes',
