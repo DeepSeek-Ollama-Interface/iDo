@@ -18,7 +18,7 @@ export async function runOllama() {
 
         const stderr = readStderr(pid);
         stderr.on('data', (data) => {
-            throw new Error(`Failed to start Ollama: ${error.message}`);
+            console.error(`STDERR: ${data}`);
         });
 
         process.on('SIGINT', async () => {
