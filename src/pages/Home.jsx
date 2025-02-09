@@ -13,6 +13,7 @@ function Home() {
   const [showReasoningMessageHistory, setShowReasoningMessageHistory] = useState(false);
   const [selectedModel, setSelectedModel] = useState("deepseek-r1:7b");
   const modelVariants = [
+    "ChatgptAPI",
     "deepseek-r1:1.5b",
     "deepseek-r1:7b",
     "deepseek-r1:8b",
@@ -20,7 +21,11 @@ function Home() {
     "deepseek-r1:32b",
     "deepseek-r1:70b",
     "deepseek-r1:671b",
-    "ChatgptAPI"
+    "codellama:7b",
+    "codellama:13b",
+    "codellama:34b",
+    "codellama:70b",
+    "openchat:7b"
   ];
 
   const handleAIResponse = (event) => {
@@ -130,6 +135,7 @@ function Home() {
         },
       })
     );
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     setUserMessage("");
   };
 
