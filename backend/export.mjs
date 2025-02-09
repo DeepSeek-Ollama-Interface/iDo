@@ -11,19 +11,20 @@ export async function runOllama() {
 
         console.log(`Ollama started with PID: ${pid}`);
 
-        const stdout = readStdout(pid);
-        stdout.on('data', (data) => {
-            console.log(`STDOUT: ${data}`);
+        process.on('message', async (msg) => {
+            console.log(`PROCESS MESSAGE: ${msg}`);
         });
 
-        const stderr = readStderr(pid);
-        stderr.on('data', (data) => {
-            console.error(`STDERR: ${data}`);
+        process.on('error', (err) => {
+            console.log(`PROCESS ERROR: ${err.message}`);
+        });
+
+        process.on('exit', (code) => {
+            console.log(`PROCESS EXITED with code ${code}`);
         });
 
         process.on('SIGINT', async () => {
             console.log('Stopping Ollama...');
-            await killProcess(pid, true);
             process.exit();
         });
 
