@@ -282,10 +282,14 @@ ipcMain.on('alwaysOnTop', () => {
   mainWindow.webContents.send(isCurrentlyAlwaysOnTop ? 'appIsUnpinned' : 'appIsPinned');
 });
 
-//Run Ollama
 async function runOllama() {
-  const backend = await import('../backend/export.mjs');
-  return backend.runOllama();
+  try {
+    const backend = await import('../backend/export.mjs');
+    return await backend.runOllama();
+  } catch (error) {
+    console.error('Failed to run Ollama:', error);
+    shell.openExternal('https://ollama.com/');
+  }
 }
 
 runOllama();
