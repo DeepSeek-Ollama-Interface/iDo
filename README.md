@@ -39,20 +39,26 @@ Before you begin, ensure that you have the following installed:
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/yourusername/ollama-deepseek-interface.git
-cd ollama-deepseek-interface
+git clone https://github.com/DeepSeek-Ollama-Interface/iDo.git
+cd ido
 ```
 
 2. **Install dependencies:**
 
 ```bash
 npm install
+cd backend
+npm install
+cd ..
 ```
 
 or if you're using yarn:
 
 ```bash
 yarn install
+cd backend
+yarn install
+cd ..
 ```
 
 3. **Build the application:**
@@ -60,32 +66,16 @@ yarn install
 To compile and run the project locally, use the following command:
 
 ```bash
-npm start
+npm run dev:win
+```
+
+or if you're using linux:
+
+```bash
+npm run dev
 ```
 
 This will start the application and open the Deepseek Interface window.
-
----
-
-## Usage
-
-Once the application is running, you can:
-
-- **Search Files:** Enter search queries in the search bar, and Deepseek-r1 will retrieve relevant files from your local directories.
-- **Voice Commands:** Click the microphone icon to activate the voice assistant. You can ask it to search for files, open directories, or help you with other system tasks.
-- **File Management:** Browse through your files and open them directly from the interface.
-
----
-
-## Contributing
-
-We welcome contributions to make **Ollama Deepseek Interface** even better! If you'd like to contribute:
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature-branch`)
-3. Make your changes and commit (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature-branch`)
-5. Create a new Pull Request
 
 ---
 
