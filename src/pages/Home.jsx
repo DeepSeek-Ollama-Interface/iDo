@@ -11,9 +11,8 @@ function Home() {
   const scrollRef = useRef(null);
   const thinkingScrollRed = useRef(null);
   const [showReasoningMessageHistory, setShowReasoningMessageHistory] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("deepseek-r1:7b");
+  const [selectedModel, setSelectedModel] = useState("deepseek-r1:1.5b");
   const modelVariants = [
-    "ChatgptAPI",
     "deepseek-r1:1.5b",
     "deepseek-r1:7b",
     "deepseek-r1:8b",
@@ -25,7 +24,8 @@ function Home() {
     "codellama:13b",
     "codellama:34b",
     "codellama:70b",
-    "openchat:7b"
+    "openchat:7b",
+    "ChatgptAPI"
   ];
 
   const handleAIResponse = (event) => {
@@ -121,6 +121,12 @@ function Home() {
     
   };  
 
+  const handleFakeUserMessage = (msg) => {
+    const newUserMessage = { message: msg, author: "system", role: "system" };
+    setMessages((prev) => [...prev, newUserMessage]);
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
   const handleUserMessage = (msg) => {
     setIsLoading(true);
     const newUserMessage = { message: msg, author: "user", role: "user" };
@@ -143,6 +149,8 @@ function Home() {
     document.dispatchEvent(
       new CustomEvent("abortAll")
     );
+
+    handleFakeUserMessage('EMERGENCY STOP');
   }
 
   const handleStreamEND = () => {
@@ -195,35 +203,37 @@ function Home() {
 
       <div className="flex-grow overflow-auto p-4">
       {messages.map((msg, index) => {
+        const formattedAuthor = msg.author.charAt(0).toUpperCase() + msg.author.slice(1);
+        
+          if (msg.author.toLowerCase() === "reasoning") {
+            return (
+              <div key={index} className="w-full mt-2 rounded-lg backdrop-blur-lg">
+                <button 
+                  onClick={() => {setShowReasoningMessageHistory(!showReasoningMessageHistory); scrollRef.current?.scrollIntoView({ behavior: "smooth" });}} 
+                  className="mb-2 cursor-pointer"
+                >
+                  {showReasoningMessageHistory ? "Hide Reasoning Message" : "Show Reasoning Message"}
+                </button>
+                {showReasoningMessageHistory && (
+                  <div className="mb-2 flex justify-start"> 
+                    <p className="inline-block p-2 rounded-lg bg-response bg-opacity-30 text-text">
+                      {msg.message}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          }
 
-        if (msg.author.toLowerCase() === "reasoning") {
           return (
-            <div key={index} className="w-full mt-2 rounded-lg backdrop-blur-lg">
-              <button 
-                onClick={() => {setShowReasoningMessageHistory(!showReasoningMessageHistory); scrollRef.current?.scrollIntoView({ behavior: "smooth" });}} 
-                className="mb-2 cursor-pointer"
-              >
-                {showReasoningMessageHistory ? "Hide Reasoning Message" : "Show Reasoning Message"}
-              </button>
-              {showReasoningMessageHistory && (
-                <div className="mb-2 text-left"> 
-                  <p className="inline-block p-2 rounded-lg bg-response bg-opacity-30 text-text">
-                    {msg.message}
-                  </p>
-                </div>
-              )}
+            <div key={index} className={`flex flex-col ${msg.author === "user" ? "items-end" : "items-start"} mt-2`}>
+              <p className="text-sm font-semibold mb-1">{formattedAuthor}</p>
+              <div className={`p-2 rounded-lg ${msg.author === "user" ? "bg-primary text-text" : "bg-response text-text"}`}>
+                <p className="whitespace-pre-wrap">{msg.message}</p>
+              </div>
             </div>
           );
-        }
-
-        return (
-          <div key={index} className={`mb-2 ${msg.author === "user" ? "text-right" : "text-left"}`}>
-            <p className={`inline-block p-2 rounded-lg ${msg.author === "user" ? "bg-primary text-text" : "bg-response text-text"}`}>
-              {msg.message}
-            </p>
-          </div>
-        );
-      })}
+        })}
 
         {isThinking && (
           <div className="w-full max-h-[400px] overflow-hidden p-2 mt-2 rounded-lg backdrop-blur-lg">
@@ -265,10 +275,9 @@ function Home() {
             <br />
           </div>
         )}
-        
-        <div ref={scrollRef} />
 
         <br/><br/>
+        <div ref={scrollRef} />
       </div>
 
       <div className="flex items-center gap-2 p-4">
