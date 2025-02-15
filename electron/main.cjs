@@ -6,10 +6,11 @@ const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
 const { format } = require('util');
+const process = require('process');
 //HERE I UPDATE VARIABLES
 const pkg = require('../package.json');
 const userAgent = format('%s/%s (%s: %s)', pkg.name, pkg.version, os.platform(), os.arch());
-const supportedPlatforms = ['darwin', 'win32'];
+const supportedPlatforms = ['linux', 'win32'];
 
 // const isDev = process.env.NODE_ENV === 'development';
 const isDev = false;
@@ -67,10 +68,6 @@ function initUpdater(opts) {
       break;
     case UpdateSourceType.StaticStorage:
       feedURL = updateSource.baseUrl;
-      if (process.platform === 'darwin') {
-        feedURL += '/RELEASES.json';
-        serverType = 'json';
-      }
       break;
   }
   const requestHeaders = { 'User-Agent': userAgent };
@@ -133,7 +130,7 @@ function makeUserNotifier(dialogProps) {
       type: 'info',
       buttons: [restartButtonText, laterButtonText],
       title,
-      message: process.platform === 'win32' ? releaseNotes : releaseName,
+      message: releaseName,
       detail,
     };
     dialog.showMessageBox(dialogOpts).then(({ response }) => {
@@ -267,9 +264,7 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  app.quit();
 });
 
 ipcMain.on('minimize', () => mainWindow.minimize());

@@ -1,13 +1,27 @@
 import ChatgptAPI from "./index.mjs";
 import { getSetting } from "../local_settings/export.mjs";
 
-const apiKey = await getSetting('apiToken');
-const chatgpt = new ChatgptAPI(apiKey);
+export async function askAI(messages, stream, model) {
+  const apiKey = await getSetting('apiToken');
+  const chatgpt = new ChatgptAPI(apiKey);
 
-export async function askAI(prompt, useBuffer = false) {
-  return await chatgpt.askAI(prompt, useBuffer);
-}
+  try {
+    const response = await chatgpt.askAI(messages, stream, model);
 
-export function clearBuffer() {
-  chatgpt.clearBuffer();
+    if (stream) {
+      return (async function* () {
+        try {
+          for await (const chunk of response) {
+            yield chunk;
+          }
+        } catch (error) {
+          yield { error: error.message || "Stream error" };
+        }
+      })();
+    }
+    
+    return response;
+  } catch (error) {
+    return { error: error.message || "Unknown error" };
+  }
 }

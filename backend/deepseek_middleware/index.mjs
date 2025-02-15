@@ -4,6 +4,7 @@ import path from 'path';
 import os, { type } from 'os';
 import { getPrompt, analyzeResponse} from '../inject_promt/export.mjs';
 import { getSetting } from '../local_settings/export.mjs';
+import { askAI } from '../chatgpt_api/export.mjs';
 
 export class DeepSeekCore {
   constructor(baseURL = 'http://127.0.0.1:11434') {
@@ -49,7 +50,7 @@ export class DeepSeekCore {
 
   #loadModelFileContent(model) {
     const sysPromt = this.#loadSystemPrompt();
-    console.dir(sysPromt);
+    console.dir(`SysPromt: ${sysPromt}`);
     return {
       model: `${model}-kepler`, // The name of the model to create
       from: model, // Base model (ensure this is valid)
@@ -102,6 +103,30 @@ export class DeepSeekCore {
     const sysPromt = this.#loadSystemPrompt();
     const inject = getSetting('injectPrompt');
     let loadSysPromt = false;
+
+    if (modelName.toLowerCase().startsWith("chatgptapi")) {
+      const model = modelName.split("~")[1];
+      const response = await askAI(payload.messages, payload.stream, model);
+    
+      console.dir(response);
+    
+      if (payload.stream) {
+        return (async function* () {
+          try {
+            for await (const chunk of response) {
+              yield chunk;
+            }
+          } catch (error) {
+            yield { error: error.message || "Stream error" };
+          }
+        })();
+      } else {
+        if (response?.error) {
+          return { error: response.error }; // Ensure error is returned to chat
+        }
+        return response;
+      }
+    }    
 
     if (sysPromt && typeof sysPromt === 'string' && sysPromt.trim() !== '') {
       loadSysPromt = true;

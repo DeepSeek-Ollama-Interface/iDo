@@ -36,7 +36,15 @@ function Home() {
     "phi4:14b",
     "llama3.3:70b",
     "mistal:7b",
-    "ChatgptAPI"
+    "ChatGPTapi~gpt-3.5-turbo",
+    "ChatGPTapi~chatgpt-4o-latest",
+    "ChatGPTapi~o1",
+    "ChatGPTapi~gpt-4",
+    "ChatGPTapi~gpt-4o",
+    "ChatGPTapi~gpt-4-turbo",
+    "ChatGPTapi~o3-mini",
+    "ChatGPTapi~o1-mini",
+    "ChatGPTapi~gpt-4o-mini"
   ];
 
   const scrollToBottom = () => {

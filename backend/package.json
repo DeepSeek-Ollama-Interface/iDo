@@ -12,7 +12,7 @@
   "dependencies": {
     "fs-extra": "^11.3.0",
     "ollama": "^0.5.12",
-    "openai": "^4.83.0",
+    "openai": "^4.85.1",
     "uuid": "^11.0.5",
     "vite-plugin-node-stdlib-browser": "^0.2.1"
   }
