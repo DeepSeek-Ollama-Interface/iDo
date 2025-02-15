@@ -4,9 +4,8 @@ export async function runOllama() {
     try {
         const command = 'ollama';
         const args = ['serve'];
-        const options = { cwd: process.cwd() };
 
-        const processInfo = await startProcess(command, args, options);
+        const processInfo = await startProcess(command, args);
         const pid = processInfo.pid;
 
         console.log(`Ollama started with PID: ${pid}`);
