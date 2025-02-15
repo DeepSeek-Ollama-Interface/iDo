@@ -8,7 +8,7 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [showThinkingMessages, setShowThinkingMessages] = useState(false);
-  const scrollRef = useRef(null);
+  const containerRef = useRef(null);
   const thinkingScrollRed = useRef(null);
   const [showReasoningMessageHistory, setShowReasoningMessageHistory] = useState(false);
   const [selectedModel, setSelectedModel] = useState("deepseek-r1:1.5b");
@@ -28,6 +28,14 @@ function Home() {
     "ChatgptAPI"
   ];
 
+  const scrollToBottom = () => {
+    requestAnimationFrame(() => {
+      if (containerRef.current) {
+        containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      }
+    });
+  };
+
   const handleAIResponse = (event) => {
     setIsLoading(false);
     const response = event.detail;
@@ -44,7 +52,7 @@ function Home() {
         } else if (response[0]?.message) {
           lastMessage.message += response[0].message;
         }
-        thinkingScrollRed.current?.scrollIntoView({ behavior: "smooth" });
+        thinkingScrollRed.current?.scrollIntoView();
       
         return newMessages;
       });      
@@ -60,17 +68,18 @@ function Home() {
           } else if (response[0]?.message) {
             lastMessage.message += response[0].message;
           }
-          scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+          
         } else if (response[0]?.message) {
           newMessages.push({
             message: response[0].message,
             author: "ai",
             role: "assistant",
           });
-          scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+
           setAiMessageIndex(newMessages.length - 1);
         }
   
+        scrollToBottom();
         return newMessages;
       });
     }
@@ -85,7 +94,6 @@ function Home() {
     if (thinkingMessages.length > 0) {
       const lastThinkingMessage = thinkingMessages[thinkingMessages.length - 1];
       if (lastThinkingMessage && lastThinkingMessage.message.includes("</think>")) {
-        console.log("IS NOT THINKING via thinking messages");
         setIsThinking(false);
     
         let extractedThinkContent = '';
@@ -122,26 +130,37 @@ function Home() {
   };  
 
   const handleFakeUserMessage = (msg) => {
-    const newUserMessage = { message: msg, author: "system", role: "system" };
-    setMessages((prev) => [...prev, newUserMessage]);
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }
+    setMessages((prev) => {
+      if (prev.length > 0 && prev[prev.length - 1].message.startsWith(msg)) {
+        const lastMessage = prev[prev.length - 1];
+        const match = lastMessage.message.match(/x(\d+)$/);
+        const count = match ? parseInt(match[1], 10) + 1 : 2;
+        return [...prev.slice(0, -1), { ...lastMessage, message: `${msg} x${count}` }];
+      }
+      return [...prev, { message: msg, author: "informations", role: "informations" }];
+    });
+    scrollToBottom();
+  };  
 
   const handleUserMessage = (msg) => {
     setIsLoading(true);
     const newUserMessage = { message: msg, author: "user", role: "user" };
     setMessages((prev) => [...prev, newUserMessage]);
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+
+    const filteredMessages = [...messages, newUserMessage].filter(
+      (m) => m.author.toLowerCase() !== "informations"
+    );
+
     document.dispatchEvent(
       new CustomEvent("AskAI", {
         detail: {
-          messages: [...messages, newUserMessage],
+          messages: filteredMessages,
           stream: true,
           model: selectedModel
         },
       })
     );
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    scrollToBottom();
     setUserMessage("");
   };
 
@@ -201,15 +220,15 @@ function Home() {
         </select>
       </div>
 
-      <div className="flex-grow overflow-auto p-4">
+      <div className="flex-grow overflow-auto p-4" ref={containerRef}>
       {messages.map((msg, index) => {
         const formattedAuthor = msg.author.charAt(0).toUpperCase() + msg.author.slice(1);
-        
+
           if (msg.author.toLowerCase() === "reasoning") {
             return (
               <div key={index} className="w-full mt-2 rounded-lg backdrop-blur-lg">
                 <button 
-                  onClick={() => {setShowReasoningMessageHistory(!showReasoningMessageHistory); scrollRef.current?.scrollIntoView({ behavior: "smooth" });}} 
+                  onClick={() => {setShowReasoningMessageHistory(!showReasoningMessageHistory); scrollToBottom();}} 
                   className="mb-2 cursor-pointer"
                 >
                   {showReasoningMessageHistory ? "Hide Reasoning Message" : "Show Reasoning Message"}
@@ -277,7 +296,6 @@ function Home() {
         )}
 
         <br/><br/>
-        <div ref={scrollRef} />
       </div>
 
       <div className="flex items-center gap-2 p-4">

@@ -21,6 +21,9 @@ export class DeepSeekCore {
       if (part.message?.content) {
         yield { content: part.message.content };
       }
+      if (part.done){
+        console.log(">>>>>>>>>>>>>>>>>>>>> DONE <<<<<<<<<<<<<<<<<<<<");
+      }
     }
   }
 
@@ -100,18 +103,28 @@ export class DeepSeekCore {
     const inject = getSetting('injectPrompt');
     let loadSysPromt = false;
 
-    if(sysPromt && typeof sysPromt === 'string' && (sysPromt !== '' || sysPromt !== ' ')){
+    if (sysPromt && typeof sysPromt === 'string' && sysPromt.trim() !== '') {
       loadSysPromt = true;
       await this.#createModelIfNotExists(modelName, true);
     } else {
       await this.#createModelIfNotExists(modelName, false);
     }
 
-    if(inject){
+    if (inject) {
       const promtToBeINjected = getPrompt();
-      console.dir(promtToBeINjected);
-      //Check if messages already contain promt
-    }
+    
+      const alreadyInjected = payload.messages.some(
+        (msg) => msg.author === "system-information" && msg.role === "system"
+      );
+    
+      if (!alreadyInjected) {
+        payload.messages.unshift({
+          message: promtToBeINjected,
+          author: "system-information",
+          role: "system",
+        });
+      }
+    }    
     
     try {
       console.log("Starting chat completion with payload:", {
