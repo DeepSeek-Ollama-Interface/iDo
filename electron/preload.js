@@ -12,7 +12,9 @@ contextBridge.exposeInMainWorld("electron", {
   onAppUnpinned: (callback) => ipcRenderer.on('appIsUnpinned', callback),
   StreamEND: (callback) => ipcRenderer.on('StreamEND', callback),
   toggleSettingsWindow: (info) => ipcRenderer.send('toggleSettingsWindow', info),
-  getLocalSettings: (data) => ipcRenderer.send('getLocalSettings', data)
+  getLocalSettings: (data) => ipcRenderer.send('getLocalSettings', data),
+  getCpuUsage: () => ipcRenderer.send('getCpuUsage'),
+  cpuUsageResult: (callback) => ipcRenderer.on("cpuUsageResult", callback)
 });
 
 ipcRenderer.on("ResponseAIIPC", (event, data) => {
@@ -54,7 +56,15 @@ document.addEventListener("AskAI", (event) => {
   try {
     ipcRenderer.send("chatCompletion", event.detail);
     setLoading(true);
-    console.log("DEBUG PRELOAD: chatCompletion IPC sent"); // DEBUG
+  } catch (error) {
+    console.error("DEBUG PRELOAD: Error sending IPC:", error); // DEBUG
+  }
+});
+
+document.addEventListener("abortAll", () => {
+  try {
+    ipcRenderer.send("abortAll");
+    setLoading(false);
   } catch (error) {
     console.error("DEBUG PRELOAD: Error sending IPC:", error); // DEBUG
   }

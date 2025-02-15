@@ -192,7 +192,7 @@ function validateInput(opts) {
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 500,
-    height: 900,
+    height: 700,
     minWidth: 400,
     minHeight: 400,
     icon: path.join(__dirname, '../build/icons/icon.png'),
@@ -276,6 +276,34 @@ ipcMain.on('minimize', () => mainWindow.minimize());
 ipcMain.on('maximize', () => mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize());
 ipcMain.on('close', () => mainWindow.close());
 
+let lastTotal = 0;
+let lastIdle = 0;
+
+// Get CPU usage
+async function getCpuUsage() {
+  const cpus = os.cpus();
+  const totalIdle = cpus.reduce((acc, cpu) => acc + cpu.times.idle, 0);
+  const totalTick = cpus.reduce((acc, cpu) => acc + Object.values(cpu.times).reduce((acc, val) => acc + val, 0), 0);
+
+  if (lastTotal === 0 && lastIdle === 0) {
+    lastTotal = totalTick;
+    lastIdle = totalIdle;
+    return 0; // No previous data, returning 0 usage as starting point
+  }
+
+  const totalDiff = totalTick - lastTotal;
+  const idleDiff = totalIdle - lastIdle;
+
+  lastTotal = totalTick;
+  lastIdle = totalIdle;
+
+  return (1 - idleDiff / totalDiff) * 100; // CPU usage as a percentage
+}
+ipcMain.on('getCpuUsage', async () => {
+  const usage = await getCpuUsage();
+  mainWindow.webContents.send('cpuUsageResult', usage);
+});
+
 ipcMain.on('alwaysOnTop', () => {
   const isCurrentlyAlwaysOnTop = mainWindow.isAlwaysOnTop();
   mainWindow.setAlwaysOnTop(!isCurrentlyAlwaysOnTop);
@@ -310,7 +338,6 @@ async function getSetting(key) {
 }
 ipcMain.on('getLocalSettings', async (event, data) => {
   const resolve = await getSetting(data);
-  console.log(resolve);
   return resolve;
 });
 
@@ -324,6 +351,17 @@ ipcMain.on('updateLocalSettings', async (event, data) => {
 });
 
 ipcMain.on('toggleSettingsWindow', () => toggleSettingsWindow());
+
+//abort all ollama streaming channels
+async function abortAllOllama() {
+  const backend = await import('../backend/deepseek_middleware/export.mjs');
+  const result = await backend.abortAll();
+  return result;
+}
+ipcMain.on('abortAll', async () => {
+  const response = await abortAllOllama();
+  console.log(`Ollama tasks aborted: ${response}`);
+});
 
 async function chatCompletion(data) {
   const backend = await import('../backend/export.mjs');

@@ -1,5 +1,6 @@
 import path from 'path';
 import os from 'os';
+import fs from 'fs-extra';
 
 export class StorageCore {
   #getSettingsFilePath() {
@@ -29,7 +30,7 @@ export class StorageCore {
 
   getSetting(key) {
     const settings = this.#loadSettings();
-    return settings[key] || null;
+    return settings[key] ? settings[key] : null;
   }
 
   updateSetting(key, value) {

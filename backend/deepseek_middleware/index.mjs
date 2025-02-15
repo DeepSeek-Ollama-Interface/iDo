@@ -1,8 +1,9 @@
 import ollama from 'ollama';
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
-import os from 'os';
-import { getSetting } from "../local_settings/export.mjs";
+import os, { type } from 'os';
+import { getPrompt, analyzeResponse} from '../inject_promt/export.mjs';
+import { getSetting } from '../local_settings/export.mjs';
 
 export class DeepSeekCore {
   constructor(baseURL = 'http://127.0.0.1:11434') {
@@ -68,30 +69,58 @@ export class DeepSeekCore {
     }
   }
 
-  async #createModelIfNotExists(modelName) {
+  async #createModelIfNotExists(modelName, custom) {
     const exists = await this.#modelExists(modelName);
     if (exists) {
       console.log(`Model "${modelName}" already exists.`);
       return;
     }
 
-    const modelfile = this.#loadModelFileContent(modelName);
-    try {
-      await ollama.create(modelfile);
-      console.log(`Model "${modelName}" created successfully.`);
-    } catch (error) {
-      throw new Error(`Failed to create model: ${error.message}`);
+    if(custom){
+      const modelfile = this.#loadModelFileContent(modelName);
+      try {
+        await ollama.create(modelfile);
+        console.log(`Model "${modelName}" created successfully.`);
+      } catch (error) {
+        throw new Error(`Failed to create model: ${error.message}`);
+      }
+    } else {
+      try {
+        await ollama.pull({ model: modelName});
+        console.log(`Model "${modelName}" loaded successfully.`);
+      } catch (error) {
+        throw new Error(`Failed to download model: ${error.message}`);
+      }
     }
   }
 
   async sendChatMessage(payload) {
     const modelName = payload.modelname;
-    await this.#createModelIfNotExists(modelName);
+    const sysPromt = this.#loadSystemPrompt();
+    const inject = getSetting('injectPrompt');
+    let loadSysPromt = false;
 
+    if(sysPromt && typeof sysPromt === 'string' && (sysPromt !== '' || sysPromt !== ' ')){
+      loadSysPromt = true;
+      await this.#createModelIfNotExists(modelName, true);
+    } else {
+      await this.#createModelIfNotExists(modelName, false);
+    }
+
+    if(inject){
+      const promtToBeINjected = getPrompt();
+      console.dir(promtToBeINjected);
+      //Check if messages already contain promt
+    }
+    
     try {
-      console.log("Starting chat completion with payload:", payload);
+      console.log("Starting chat completion with payload:", {
+        model: loadSysPromt ? `${modelName}-kepler` : `${modelName}`,
+        messages: payload.messages,
+        stream: payload.stream
+      });
       const response = await ollama.chat({
-        model: `${modelName}-kepler`,
+        model: loadSysPromt ? `${modelName}-kepler` : `${modelName}`,
         messages: payload.messages,
         stream: payload.stream
       });
@@ -99,6 +128,16 @@ export class DeepSeekCore {
     } catch (error) {
       console.error("Error in sendChatMessage:", error);
       throw error;
+    }
+  }
+
+  async abortAll(){
+    try {
+      ollama.abort();
+      return true;
+    } catch(e){
+      console.error(e);
+      return false;
     }
   }
 }

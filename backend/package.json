@@ -10,9 +10,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "fs": "^0.0.1-security",
+    "fs-extra": "^11.3.0",
     "ollama": "^0.5.12",
     "openai": "^4.83.0",
-    "uuid": "^11.0.5"
+    "uuid": "^11.0.5",
+    "vite-plugin-node-stdlib-browser": "^0.2.1"
   }
 }

@@ -43,6 +43,11 @@ function validateOptions(options) {
   }
 }
 
+export async function abortAll(){
+  const result = deepseek.abortAll();
+  return result;
+}
+
 export async function chatCompletion(params) {
 
   console.debug(`\u001b[31m DEBUG EXPORT.MJS chatCompletion PARAMS ${JSON.stringify(params)} \u001b[0m`) // DEBUG
