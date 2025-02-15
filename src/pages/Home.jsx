@@ -20,11 +20,22 @@ function Home() {
     "deepseek-r1:32b",
     "deepseek-r1:70b",
     "deepseek-r1:671b",
+    "qwen:0.5b",
+    "qwen:1.8b",
+    "qwen:4b",
+    "qwen:7b",
+    "qwen:14b",
+    "qwen:32b",
+    "qwen:72b",
+    "qwen:110b",
     "codellama:7b",
     "codellama:13b",
     "codellama:34b",
     "codellama:70b",
     "openchat:7b",
+    "phi4:14b",
+    "llama3.3:70b",
+    "mistal:7b",
     "ChatgptAPI"
   ];
 
