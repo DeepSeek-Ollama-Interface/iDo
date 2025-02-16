@@ -178,7 +178,33 @@ export default function useChatHandlers() {
       author: "system",
       role: "system",
     };
-    setMessages((prev) => [...prev, systemMessage]);
+
+    setMessages((prev) => {
+      const updatedMessages = [...prev, systemMessage];
+      // const filteredMessages = updatedMessages.filter(
+      //   (m) => m.author.toLowerCase() !== "informations"
+      // );
+
+      // console.dir({
+      //   detail: {
+      //     messages: filteredMessages,
+      //     stream: true,
+      //     model: selectedModel
+      //   },
+      // });
+      
+      // document.dispatchEvent(
+      //   new CustomEvent("AskAI", {
+      //     detail: {
+      //       messages: filteredMessages,
+      //       stream: true,
+      //       model: selectedModel
+      //     },
+      //   })
+      // );
+      return updatedMessages;
+    });
+
   }, []);
 
   useEffect(() => {
