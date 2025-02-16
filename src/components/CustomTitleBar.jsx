@@ -38,28 +38,36 @@ function CustomTitlebar() {
   }, []);
 
   return (
-    <div className="w-full h-6 titleBarColor text-text flex items-center justify-between select-none px-2 py-4" style={{ WebkitAppRegion: "drag"}}>
+    <div className="w-full h-6 titleBarColor text-text flex items-center select-none px-2 py-4" style={{ WebkitAppRegion: "drag"}}>
 
-      <div className='flex flex-inline gap-2 items-center justify-center'>
+      <div className='flex flex-inline items-center justify-center'>
         <img src={faviconDark} alt="favicon" className="w-6 h-6"/>
-        <h1>iDO</h1>
-        <span className="ml-4 text-white">{cpuUsage.toFixed(1)}% CPU</span>
       </div>
 
-      <div className="flex space-x-[2px] shadow-md" style={{ WebkitAppRegion: "no-drag" }}>
-        <button className="px-3 py-2 rounded-full h-8 flex items-center justify-center mt-[2px] transition duration-300 outline-none focus:ring-0 mr-2 cursor-pointer group"
-          onClick={() => window.electron.toggleSettingsWindow()} 
-        >
-          <svg width={'20px'} height={'20px'} fill='white' viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M512 661.994667q61.994667 0 106.005333-44.010667t44.010667-106.005333-44.010667-106.005333-106.005333-44.010667-106.005333 44.010667-44.010667 106.005333 44.010667 106.005333 106.005333 44.010667zM829.994667 554.005333l90.005333 69.994667q13.994667 10.005333 4.010667 28.010667l-85.994667 148.010667q-8 13.994667-26.005333 8l-106.005333-42.005333q-42.005333 29.994667-72 42.005333l-16 112q-4.010667 18.005333-20.010667 18.005333l-172.010667 0q-16 0-20.010667-18.005333l-16-112q-37.994667-16-72-42.005333l-106.005333 42.005333q-18.005333 5.994667-26.005333-8l-85.994667-148.010667q-10.005333-18.005333 4.010667-28.010667l90.005333-69.994667q-2.005333-13.994667-2.005333-42.005333t2.005333-42.005333l-90.005333-69.994667q-13.994667-10.005333-4.010667-28.010667l85.994667-148.010667q8-13.994667 26.005333-8l106.005333 42.005333q42.005333-29.994667 72-42.005333l16-112q4.010667-18.005333 20.010667-18.005333l172.010667 0q16 0 20.010667 18.005333l16 112q37.994667 16 72 42.005333l106.005333-42.005333q18.005333-5.994667 26.005333 8l85.994667 148.010667q10.005333 18.005333-4.010667 28.010667l-90.005333 69.994667q2.005333 13.994667 2.005333 42.005333t-2.005333 42.005333z"  /></svg>
-        </button>
-        
-        <button className="px-3 py-2 rounded-full h-8 flex items-center justify-center mt-[2px] transition duration-300 outline-none focus:ring-0 mr-4 cursor-pointer group" 
-        onClick={() => window.electron.alwaysOnTop()}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 16 16" fill={isPinned ? 'gray' : 'white'} className="group-hover:fill-gray-400">
-            <path d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5h-4v4.5c0 .276-.224 1.5-.5 1.5s-.5-1.224-.5-1.5V10h-4a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.189A6 6 0 0 1 5 6.708V2.277a3 3 0 0 1-.354-.298C4.342 1.674 4 1.179 4 .5a.5.5 0 0 1 .146-.354z"/>
+      <div className='flex flex-inline items-center justify-center' style={{ WebkitAppRegion: "no-drag" }}>
+        {/* <img src={faviconDark} alt="favicon" className="w-6 h-6"/>
+        <h1>iDO</h1> */}
+
+        <button 
+          onClick={() => window.electron.toggleSettingsWindow()}
+          className='rounded-full h-8 flex items-center justify-center mt-[2px] transition duration-300 outline-none focus:ring-0 mr-2 cursor-pointer group'>
+          <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="white">
+            <path d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z"/>
           </svg>
         </button>
 
+        <button 
+          onClick={() => window.electron.alwaysOnTop()}
+          className='rounded-full h-8 flex items-center justify-center mt-[2px] transition duration-300 outline-none focus:ring-0 mr-2 cursor-pointer group'>
+          <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill={isPinned ? 'gray' : 'white'}>
+            <path d="m640-480 80 80v80H520v240l-40 40-40-40v-240H240v-80l80-80v-280h-40v-80h400v80h-40v280Zm-286 80h252l-46-46v-314H400v314l-46 46Zm126 0Z"/>
+          </svg>
+        </button>
+      </div>
+
+      <span className="text-sm">{cpuUsage.toFixed(1)}% CPU</span>
+
+      <div className="flex space-x-[2px] shadow-md ml-auto" style={{ WebkitAppRegion: "no-drag" }}>
         <button className="px-3 py-2 rounded-full h-8 flex items-center justify-center mt-[2px] transition duration-300 outline-none focus:ring-0 mr-2 cursor-pointer group" 
         onClick={() => window.electron.minimize()}>
           <svg xmlns="http://www.w3.org/2000/svg" height="20px" width="20px" viewBox="0 -960 960 960" fill="white" className="group-hover:fill-gray-400"><path d="M240-120v-80h480v80H240Z"/></svg>
