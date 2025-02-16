@@ -203,6 +203,20 @@ export async function readDocx(filePath) {
     return result.value;
 }
 
+/**
+ * @param {string} filePath - Absolute path to file
+ * @returns {Promise<string>} - Content of the file
+ */
+export async function readFile(filePath) {
+    try {
+        const content = await fs.readFile(filePath, 'utf8');
+        return content;
+    } catch (error) {
+        console.error(`Error reading file ${filePath}:`, error);
+        return null;
+    }
+}
+
 export {
     listAll,
     listDirectories,

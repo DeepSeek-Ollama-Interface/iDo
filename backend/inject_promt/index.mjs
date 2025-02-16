@@ -17,6 +17,7 @@ class InjectPromptCore {
       { name: "deleteFileOrDir", params: ["targetPath: string"] },
       { name: "moveFileOrDir", params: ["oldPath: string", "newPath: string"] },
       { name: "copyFileOrDir", params: ["src: string", "dest: string"] },
+      { name: "readFile", params: ["filePath: string"], return: "string" },
       
       // PDF Functions
       { name: "createPDF", params: ["filePath: string", "text: string"] },
