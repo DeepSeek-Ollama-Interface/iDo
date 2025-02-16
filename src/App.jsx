@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home.jsx";
+// import Home from "./pages/Home.jsx";
+import Home from "./test/Home.jsx";
 import Settings from "./pages/Settings.jsx";
-import HomeTest from "./test/Home.jsx";
 
 async function getAllSettings() {
   const backend = await import("../backend/local_settings/export.mjs");
@@ -28,6 +28,7 @@ function App() {
   
 
   /* HomeTest.jsx
+  * import Home from "./test/Home.jsx";
   * To be easier to modify the code
   * Will be added in the future
   * <Route path="/" element={<HomeTest />} />

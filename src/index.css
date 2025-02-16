@@ -8,7 +8,8 @@
   scrollbar-width: none;
   padding: 0;
   margin: 0;
-  background: linear-gradient(to bottom, #000121, #00315c);
+  /* background: linear-gradient(to bottom, #000121, #00315c); */
+  background: #2B2D31;
   color: #dae1fb;
 }
 
@@ -27,9 +28,10 @@ body {
 }
 
 .titleBarColor {
-  background-color: #000121;
+  /* background-color: #000121; */
+  background-color: #1E1F22;
 }
 
 .sendMsgColor {
-  background-color: #02427a;
+  background-color: #B5BAC1;
 }
