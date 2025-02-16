@@ -40,7 +40,7 @@ export const modelVariants = [
           Select Model:
         </label>
         <select
-          className="select w-full bg-surface text-text border-muted focus:border-muted focus:ring-0 outline-none"
+          className="select w-full bg-[#383A40] text-text border-none focus:outline-none focus:ring-0"
           value={selectedModel}
           onChange={(e) => {
             const newModel = e.target.value;

@@ -12,7 +12,7 @@ export default function ChatMessages({
     thinkingScrollRed
   }) {
     return (
-      <div className="flex-grow overflow-auto p-4" ref={containerRef}>
+      <div className="flex-grow overflow-y-auto p-4" ref={containerRef}>
         {messages.map((msg, index) => {
           const formattedAuthor = msg.author.charAt(0).toUpperCase() + msg.author.slice(1);
   
