@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
-// import Home from "./pages/Home.jsx";
-import Home from "./test/Home.jsx";
+import Home from "./pages/Home.jsx";
 import Settings from "./pages/Settings.jsx";
 
 async function getAllSettings() {
@@ -24,15 +23,6 @@ function App() {
 
     fetchSettings();
   }, []);
-
-  
-
-  /* HomeTest.jsx
-  * import Home from "./test/Home.jsx";
-  * To be easier to modify the code
-  * Will be added in the future
-  * <Route path="/" element={<HomeTest />} />
-  */
 
   return (
     <Routes>
