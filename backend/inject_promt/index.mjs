@@ -124,8 +124,7 @@ class InjectPromptCore {
         // Cleanup temp.js
         fs.unlinkSync(scriptPath);
 
-        console.log(JSON.stringify(result));
-        resolve(`Previous operation result: ${JSON.stringify(result)} the script runned is: ${script}`);
+        resolve(JSON.stringify(result));
       });
     });
   }
