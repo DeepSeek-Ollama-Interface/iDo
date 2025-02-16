@@ -4,26 +4,24 @@ import path from 'path';
 import os, { type } from 'os';
 import { getPrompt, analyzeResponse} from '../inject_promt/export.mjs';
 import { getSetting } from '../local_settings/export.mjs';
-import { askAI } from '../chatgpt_api/export.mjs';
+import { askAI, abortAll as abortAllGPT } from '../chatgpt_api/export.mjs';
 
 export class DeepSeekCore {
-  constructor(baseURL = 'http://127.0.0.1:11434') {
-    this.baseURL = baseURL;
-    this.headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/x-ndjson',
-      'User-Agent': 'ollama/0.5.7 (amd64 linux) Go/go1.23.4',
-      'Accept-Encoding': 'gzip'
-    };
+  constructor() {
+    this.something = null;
   }
 
   async *#handleStream(stream) {
     for await (const part of stream) {
-      if (part.message?.content) {
-        yield { content: part.message.content };
-      }
-      if (part.done){
-        console.log(">>>>>>>>>>>>>>>>>>>>> DONE <<<<<<<<<<<<<<<<<<<<");
+      if(typeof part === 'string'){
+        yield { content: part }
+      } else if(typeof part === 'object'){
+        if (part.message?.content) {
+          yield { content: part.message.content, done: part.done ? true : false };
+        }
+        if (part.done){
+          console.log(">>>>>>>>>>>>>>>>>>>>> DONE <<<<<<<<<<<<<<<<<<<<");
+        }
       }
     }
   }
@@ -50,7 +48,6 @@ export class DeepSeekCore {
 
   #loadModelFileContent(model) {
     const sysPromt = this.#loadSystemPrompt();
-    console.dir(`SysPromt: ${sysPromt}`);
     return {
       model: `${model}-kepler`, // The name of the model to create
       from: model, // Base model (ensure this is valid)
@@ -104,37 +101,6 @@ export class DeepSeekCore {
     const inject = getSetting('injectPrompt');
     let loadSysPromt = false;
 
-    if (modelName.toLowerCase().startsWith("chatgptapi")) {
-      const model = modelName.split("~")[1];
-      const response = await askAI(payload.messages, payload.stream, model);
-    
-      console.dir(response);
-    
-      if (payload.stream) {
-        return (async function* () {
-          try {
-            for await (const chunk of response) {
-              yield chunk;
-            }
-          } catch (error) {
-            yield { error: error.message || "Stream error" };
-          }
-        })();
-      } else {
-        if (response?.error) {
-          return { error: response.error }; // Ensure error is returned to chat
-        }
-        return response;
-      }
-    }    
-
-    if (sysPromt && typeof sysPromt === 'string' && sysPromt.trim() !== '') {
-      loadSysPromt = true;
-      await this.#createModelIfNotExists(modelName, true);
-    } else {
-      await this.#createModelIfNotExists(modelName, false);
-    }
-
     if (inject) {
       const promtToBeINjected = getPrompt();
     
@@ -150,6 +116,20 @@ export class DeepSeekCore {
         });
       }
     }    
+
+    if (modelName.toLowerCase().startsWith("chatgptapi")) {
+      const model = modelName.split("~")[1];
+      const response = await askAI(payload.messages, payload.stream, model);
+    
+      return payload.stream ? this.#handleStream(response) : response;
+    }
+
+    if (sysPromt && typeof sysPromt === 'string' && sysPromt.trim() !== '') {
+      loadSysPromt = true;
+      await this.#createModelIfNotExists(modelName, true);
+    } else {
+      await this.#createModelIfNotExists(modelName, false);
+    }
     
     try {
       console.log("Starting chat completion with payload:", {
@@ -172,6 +152,7 @@ export class DeepSeekCore {
   async abortAll(){
     try {
       ollama.abort();
+      abortAllGPT();
       return true;
     } catch(e){
       console.error(e);

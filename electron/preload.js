@@ -1,4 +1,5 @@
 const { contextBridge, ipcRenderer } = require("electron");
+ipcRenderer.setMaxListeners(20);
 
 contextBridge.exposeInMainWorld("electron", {
   platform: process.platform,
@@ -11,6 +12,7 @@ contextBridge.exposeInMainWorld("electron", {
   onAppPinned: (callback) => ipcRenderer.on('appIsPinned', callback),
   onAppUnpinned: (callback) => ipcRenderer.on('appIsUnpinned', callback),
   StreamEND: (callback) => ipcRenderer.on('StreamEND', callback),
+  removeStreamENDListeners: () => ipcRenderer.removeAllListeners("StreamEND"),
   toggleSettingsWindow: (info) => ipcRenderer.send('toggleSettingsWindow', info),
   getLocalSettings: (data) => ipcRenderer.send('getLocalSettings', data),
   getCpuUsage: () => ipcRenderer.send('getCpuUsage'),
@@ -68,4 +70,28 @@ document.addEventListener("abortAll", () => {
   } catch (error) {
     console.error("DEBUG PRELOAD: Error sending IPC:", error); // DEBUG
   }
+});
+
+document.addEventListener("executeFunction", (event) => {
+  console.log("IMPORTANTTTTTTTTTTT");
+  console.dir(event.detail);
+  console.log("IMPORTANTTTTTTTTTTT");
+
+  // Extract the script content between <funcx> and </funcx>
+  const script = event.detail.replace(/<\/?funcx>/g, "").trim();
+
+  console.log("Executing script:", script);
+
+  // Send script to main process
+  ipcRenderer.send("executeFunction", script);
+});
+
+ipcRenderer.on("executeFunction-response", (event, response) => {
+  console.log("Received response from main process:", response);
+
+  // Dispatch a document event with the response details
+  const responseEvent = new CustomEvent("executeFunction-response", {
+    detail: response,
+  });
+  document.dispatchEvent(responseEvent);
 });

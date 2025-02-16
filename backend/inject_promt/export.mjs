@@ -6,11 +6,7 @@ export function getPrompt() {
   return injectPrompt.getPrompt();
 }
 
-export async function analyzeResponse(messages) {
-  if (!Array.isArray(messages) || messages.length === 0) {
-    throw new Error('Messages must be a non-empty array');
-  }
-
-  const response = injectPrompt.analyzeResponse(messages);
+export async function analyzeResponse(script) {
+  const response = injectPrompt.analyzeResponse(script);
   return response;
 }

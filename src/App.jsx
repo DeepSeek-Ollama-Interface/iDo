@@ -18,7 +18,7 @@ function App() {
           localStorage.setItem(key, value);
         });
       } catch (error) {
-        console.error("Failed to load settings:", error);
+        console.log("Failed to load settings");
       }
     }
 

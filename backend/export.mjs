@@ -34,3 +34,4 @@ export async function runOllama() {
 }
 
 export * from './deepseek_middleware/export.mjs';
+export * from './inject_promt/export.mjs';

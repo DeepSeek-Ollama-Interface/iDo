@@ -1,9 +1,10 @@
 import ChatgptAPI from "./index.mjs";
 import { getSetting } from "../local_settings/export.mjs";
+let chatgpt = null;
 
 export async function askAI(messages, stream, model) {
   const apiKey = await getSetting('apiToken');
-  const chatgpt = new ChatgptAPI(apiKey);
+  chatgpt = new ChatgptAPI(apiKey);
 
   try {
     const response = await chatgpt.askAI(messages, stream, model);
@@ -23,5 +24,11 @@ export async function askAI(messages, stream, model) {
     return response;
   } catch (error) {
     return { error: error.message || "Unknown error" };
+  }
+}
+
+export async function abortAll(){
+  if(chatgpt){
+    chatgpt.abortAll();
   }
 }

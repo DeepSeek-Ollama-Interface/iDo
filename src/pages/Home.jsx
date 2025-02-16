@@ -8,6 +8,8 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [showThinkingMessages, setShowThinkingMessages] = useState(false);
+  const [isCoding, setIsCoding] = useState(false);
+  const [codingMessage, setCodingMessage] = useState("");
   const containerRef = useRef(null);
   const thinkingScrollRed = useRef(null);
   const [showReasoningMessageHistory, setShowReasoningMessageHistory] = useState(false);
@@ -59,8 +61,33 @@ function Home() {
     setIsLoading(false);
     const response = event.detail;
   
+    if (isCoding) {
+      let completedCode = codingMessage || ""; // Ensure it's initialized
+    
+      // Append new chunks of response
+      if (response?.chunk) {
+        completedCode += response.chunk;
+      } else if (response?.[0]?.message) {
+        completedCode += response[0].message;
+      }
+    
+      // Update the coding message state
+      setCodingMessage(completedCode);
+    
+      console.dir(completedCode);
+      console.dir(completedCode.includes("</funcx"));
+    
+      // Stop coding when </funcx> is detected
+      if (completedCode.includes("</func")) {
+        completedCode += "x>";
+        setIsCoding(false);
+        console.dir(completedCode);
+        const event = new CustomEvent("executeFunction", { detail: completedCode });
+        document.dispatchEvent(event);
+      }
+    }    
+
     if (isThinking) {
-      console.dir(thinkingMessages)
       setThinkingMessages((prev) => {
         let newMessages = [...thinkingMessages];
       
@@ -75,7 +102,9 @@ function Home() {
       
         return newMessages;
       });      
-    } else {
+    }
+    
+    if(!isThinking && !isCoding){
       setMessages((prev) => {
         let newMessages = [...prev];
   
@@ -103,9 +132,24 @@ function Home() {
       });
     }
   
-    const lastMessage = messages[messages.length - 1];
-    if (lastMessage && lastMessage.message.includes("<think>") && !lastMessage.message.includes("</think>")) {
-      setThinkingMessages((prevThinkingMessages) => [...prevThinkingMessages, lastMessage]);
+    const lastAIMessageIndex = [...messages].reverse().findIndex(msg => msg.author.toLowerCase() === 'ai');
+    let lastAIMessage = {};
+
+    if (lastAIMessageIndex !== -1) {
+      lastAIMessage = messages[messages.length - 1 - lastAIMessageIndex];
+    
+      if (lastAIMessage.message.includes("<funcx>") && !lastAIMessage.message.includes("</funcx>")) {
+        // Move message content to codingMessage
+        setCodingMessage(lastAIMessage.message);
+        setIsCoding(true);
+    
+        // Remove the last AI message from messages
+        setMessages((prevMessages) => prevMessages.filter((_, index) => index !== messages.length - 1 - lastAIMessageIndex));
+      }
+    }    
+
+    if (lastAIMessage && lastAIMessage.message && lastAIMessage.message.includes("<think>") && !lastAIMessage.message.includes("</think>")) {
+      setThinkingMessages((prevThinkingMessages) => [...prevThinkingMessages, lastAIMessage]);
       setMessages((prevMessages) => prevMessages.slice(0, prevMessages.length - 1));
       setIsThinking(true);
     }
@@ -122,7 +166,6 @@ function Home() {
           const thinkMatch = msg.message.match(/<think>(.*?)<\/think>/s);
           if (thinkMatch) {
             extractedThinkContent = thinkMatch[1];
-            console.dir(extractedThinkContent);
           }
     
           const cleanedMessage = msg.message.replace(/<think>.*?<\/think>/gs, '').trim();
@@ -192,6 +235,7 @@ function Home() {
   }
 
   const handleStreamEND = () => {
+    setIsCoding(false);
     setIsThinking(false);
     setAiMessageIndex(null);
     setIsLoading(false);
@@ -201,23 +245,41 @@ function Home() {
     setShowThinkingMessages(!showThinkingMessages);
   };
 
-  useEffect(() => {
-    try {
-      window.electron.StreamEND(handleStreamEND);
-    } catch (e){
-      console.log(e);
-    }
+  const handleExecuteFunctionResponse = (event) => {
+    const systemMessage = {
+      message: event.detail,
+      author: "system",
+      role: "system",
+    };
 
+    setMessages((prevMessages) => [...prevMessages, systemMessage]);
+
+    const filteredMessages = [...messages, systemMessage].filter(
+      (m) => m.author.toLowerCase() !== "informations"
+    );
+
+    document.dispatchEvent(
+      new CustomEvent("AskAI", {
+        detail: {
+          messages: filteredMessages,
+          stream: true,
+          model: selectedModel,
+        },
+      })
+    );
+  };
+
+  useEffect(() => {
+    window.electron.StreamEND(handleStreamEND);
     document.addEventListener("ResponseAI", handleAIResponse);
+    document.addEventListener("executeFunction-response", handleExecuteFunctionResponse);
+
     return () => {
       document.removeEventListener("ResponseAI", handleAIResponse);
-      try {
-        window.electron.StreamEND(() => {});
-      } catch(e){
-        console.log(e);
-      }
+      document.removeEventListener("executeFunction-response", handleExecuteFunctionResponse);
+      window.electron.removeStreamENDListeners();
     };
-  }, [messages]);
+  }, [messages, codingMessage]);
 
   return (
     <div className="h-[96%] w-full flex flex-col">
@@ -272,6 +334,17 @@ function Home() {
             </div>
           );
         })}
+
+        {isCoding && (
+          <div className="w-full max-h-[400px] overflow-hidden p-2 mt-2 rounded-lg backdrop-blur-lg">
+            <div className="text-center mb-2">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+              <br />
+              <span>Working...</span>
+              <br />
+            </div>
+          </div>
+        )}
 
         {isThinking && (
           <div className="w-full max-h-[400px] overflow-hidden p-2 mt-2 rounded-lg backdrop-blur-lg">

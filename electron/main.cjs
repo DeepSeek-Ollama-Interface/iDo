@@ -373,9 +373,26 @@ ipcMain.on('chatCompletion', async (event, data) => {
       mainWindow.webContents.send('ResponseAIIPC', { details: { done: true } });
       mainWindow.webContents.send('StreamEND');
     }
+    if(data.done){
+      mainWindow.webContents.send('ResponseAIIPC', { details: { done: true } });
+      mainWindow.webContents.send('StreamEND');
+    }
   } catch (error) {
     mainWindow.webContents.send('ResponseAIIPC', { error: error.message || 'Unknown error' });
     mainWindow.webContents.send('StreamEND');
+  }
+});
+
+async function loadExecuteFunction(callback) {
+  const backend = await import('../backend/export.mjs');
+  return backend.analyzeResponse(callback);
+}
+ipcMain.on('executeFunction', async (event, data) => {
+  try {
+    const result = await loadExecuteFunction(data);
+    event.reply('executeFunction-response', result);
+  } catch (error) {
+    event.reply('executeFunction-response', { error: error.message });
   }
 });
 
