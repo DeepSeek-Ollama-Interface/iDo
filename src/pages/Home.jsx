@@ -9,7 +9,7 @@ function Home() {
   const [isThinking, setIsThinking] = useState(false);
   const [showThinkingMessages, setShowThinkingMessages] = useState(false);
   const [isCoding, setIsCoding] = useState(false);
-  const [codingMessage, setCodingMessage] = useState("");
+  // const [codingMessage, setCodingMessage] = useState("");
   const containerRef = useRef(null);
   const thinkingScrollRed = useRef(null);
   const [showReasoningMessageHistory, setShowReasoningMessageHistory] = useState(false);
@@ -60,41 +60,6 @@ function Home() {
   const handleAIResponse = (event) => {
     setIsLoading(false);
     const response = event.detail;
-  
-    if (isCoding) {
-      let completedCode = codingMessage || ""; // Ensure it's initialized
-    
-      // Append new chunks of response
-      if (response?.chunk) {
-        completedCode += response.chunk;
-      } else if (response?.[0]?.message) {
-        completedCode += response[0].message;
-      }
-    
-      // Update the coding message state
-      setCodingMessage(completedCode);
-    
-      console.dir(completedCode);
-      console.dir(completedCode.includes("</funcx"));
-    
-      // Stop coding when </funcx> is detected
-      if (completedCode.includes("</func")) {
-        completedCode += "x>";
-        setIsCoding(false);
-        console.dir(completedCode);
-      
-        // Ensure the final result starts with "import { ..."
-        if (!completedCode.startsWith("import {")) {
-          completedCode = "import " + completedCode.trimStart();
-        }
-
-        console.log(completedCode);
-      
-        const event = new CustomEvent("executeFunction", { detail: completedCode });
-        document.dispatchEvent(event);
-      }
-      
-    }    
 
     if (isThinking) {
       setThinkingMessages((prev) => {
@@ -113,7 +78,7 @@ function Home() {
       });      
     }
     
-    if(!isThinking && !isCoding){
+    if(!isThinking){
       setMessages((prev) => {
         let newMessages = [...prev];
   
@@ -147,32 +112,9 @@ function Home() {
     if (lastAIMessageIndex !== -1) {
       lastAIMessage = messages[messages.length - 1 - lastAIMessageIndex];
 
-      if (lastAIMessage.message.includes("<funcx>") && !lastAIMessage.message.includes("</funcx>")) {
-
-        //LETS DO A SPLIT HERE, SPLIT BY <FUNCX> NUMBER [0] WILL BE KEPT AS TEXT MESSAGE AND NUMBER [1] WILL BE KEPT AS SCRIPT
-
-        // Move message content to codingMessage
-        setCodingMessage(lastAIMessage.message);
+      if (lastAIMessage.message.includes("<func>") && !lastAIMessage.message.includes("</func>")) {
         setIsCoding(true);
-    
-        // Remove the last AI message from messages
-        setMessages((prevMessages) => prevMessages.filter((_, index) => index !== messages.length - 1 - lastAIMessageIndex));
-      }
-      
-      if (lastAIMessage.message.includes("funcx>") && !lastAIMessage.message.includes("<funcx>") && !lastAIMessage.message.includes("</funcx>")) {
-        
-        // Correct "funcx>" to "<funcx>"
-        lastAIMessage.message = lastAIMessage.message.replace(/funcx>/g, "<funcx>");
-      
-        //LETS DO A SPLIT HERE, SPLIT BY <FUNCX> NUMBER [0] WILL BE KEPT AS TEXT MESSAGE AND NUMBER [1] WILL BE KEPT AS SCRIPT
-
-        // Move message content to codingMessage
-        setCodingMessage(lastAIMessage.message);
-        setIsCoding(true);
-      
-        // Remove the last AI message from messages
-        setMessages((prevMessages) => prevMessages.filter((_, index) => index !== messages.length - 1 - lastAIMessageIndex));
-      }      
+      } 
     }    
 
     if (lastAIMessage && lastAIMessage.message && lastAIMessage.message.includes("<think>") && !lastAIMessage.message.includes("</think>")) {
@@ -266,6 +208,17 @@ function Home() {
     setIsThinking(false);
     setAiMessageIndex(null);
     setIsLoading(false);
+
+    // messages
+    const getLastAIMessageIndex = [...messages].reverse().find(msg => msg.author.toLowerCase() === "ai");
+    //getLastAIMessageIndex.message
+    //.match(/<systemCommand>(.*?)<\/systemCommand>/);
+
+    const command = getLastAIMessageIndex.message.match(/<func>(.*?)<\/func>/s);
+    console.dir(command[1]);
+
+    const event = new CustomEvent("executeFunction", { detail: command[1] });
+    document.dispatchEvent(event);
   };
 
   const toggleThinkingMessages = () => {
@@ -298,7 +251,7 @@ function Home() {
       document.removeEventListener("executeFunction-response", handleExecuteFunctionResponse);
       window.electron.removeStreamENDListeners();
     };
-  }, [messages, codingMessage]);
+  }, [messages]);
 
   return (
     <div className="h-[96%] w-full flex flex-col">
