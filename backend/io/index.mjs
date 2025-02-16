@@ -1,5 +1,11 @@
 import fs from 'fs-extra';
 import path from 'path';
+import { PDFDocument } from 'pdf-lib';
+import ExcelJS from 'exceljs';
+import PptxGenJS from 'pptxgenjs';
+import sharp from 'sharp';
+import mammoth from 'mammoth';
+import { Packer, Document, Paragraph, TextRun } from 'docx';
 
 /**
  * @param {string} basePath - Absolute path to directory
@@ -135,6 +141,66 @@ async function copyFileOrDir(src, dest) {
     } else {
         await fs.copyFile(src, dest);
     }
+}
+
+// PDF Functions
+export async function createPDF(filePath, text) {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage();
+    page.drawText(text, { x: 50, y: 700 });
+    const pdfBytes = await pdfDoc.save();
+    await fs.writeFile(filePath, pdfBytes);
+}
+
+export async function editPDF(filePath, newText) {
+    const existingPdfBytes = await fs.readFile(filePath);
+    const pdfDoc = await PDFDocument.load(existingPdfBytes);
+    const page = pdfDoc.getPages()[0];
+    page.drawText(newText, { x: 50, y: 600 });
+    const pdfBytes = await pdfDoc.save();
+    await fs.writeFile(filePath, pdfBytes);
+}
+
+// Excel Functions
+export async function createExcel(filePath) {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Sheet 1');
+    worksheet.addRow(['Hello', 'World']);
+    await workbook.xlsx.writeFile(filePath);
+}
+
+// PowerPoint Functions
+export async function createPowerPoint(filePath) {
+    let pres = new PptxGenJS();
+    let slide = pres.addSlide();
+    slide.addText('Hello, PowerPoint!', { x: 1, y: 1, fontSize: 18 });
+    await pres.writeFile(filePath);
+}
+
+// PNG Functions
+export async function createPNG(filePath, width, height, color) {
+    await sharp({ create: { width, height, channels: 4, background: color } })
+        .png()
+        .toFile(filePath);
+}
+
+// DOC and DOCX Functions
+export async function createDocx(filePath, text) {
+    const doc = new Document({
+        sections: [
+            {
+                children: [new Paragraph(text)],
+            },
+        ],
+    });
+
+    const buffer = await Packer.toBuffer(doc);
+    await fs.writeFile(filePath, buffer);
+}
+
+export async function readDocx(filePath) {
+    const result = await mammoth.extractRawText({ path: filePath });
+    return result.value;
 }
 
 export {

@@ -125,3 +125,36 @@ export async function copyFileOrDir(src, dest) {
     
     return io.copyFileOrDir(sanitizedSrc, sanitizedDest);
 }
+
+// PDF Functions
+export async function createPDF(filePath, text) {
+    return io.createPDF(sanitizePath(filePath), text);
+}
+
+export async function editPDF(filePath, newText) {
+    return io.editPDF(sanitizePath(filePath), newText);
+}
+
+// Excel Functions
+export async function createExcel(filePath) {
+    return io.createExcel(sanitizePath(filePath));
+}
+
+// PowerPoint Functions
+export async function createPowerPoint(filePath) {
+    return io.createPowerPoint(sanitizePath(filePath));
+}
+
+// PNG Functions
+export async function createPNG(filePath, width, height, color) {
+    return io.createPNG(sanitizePath(filePath), width, height, color);
+}
+
+// DOCX Functions
+export async function createDocx(filePath, text) {
+    return io.createDocx(sanitizePath(filePath), text);
+}
+
+export async function readDocx(filePath) {
+    return io.readDocx(sanitizePath(filePath));
+}

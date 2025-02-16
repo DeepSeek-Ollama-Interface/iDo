@@ -148,6 +148,9 @@ function Home() {
       lastAIMessage = messages[messages.length - 1 - lastAIMessageIndex];
 
       if (lastAIMessage.message.includes("<funcx>") && !lastAIMessage.message.includes("</funcx>")) {
+
+        //LETS DO A SPLIT HERE, SPLIT BY <FUNCX> NUMBER [0] WILL BE KEPT AS TEXT MESSAGE AND NUMBER [1] WILL BE KEPT AS SCRIPT
+
         // Move message content to codingMessage
         setCodingMessage(lastAIMessage.message);
         setIsCoding(true);
@@ -155,10 +158,14 @@ function Home() {
         // Remove the last AI message from messages
         setMessages((prevMessages) => prevMessages.filter((_, index) => index !== messages.length - 1 - lastAIMessageIndex));
       }
-      if (lastAIMessage.message.includes("funcx>") && !lastAIMessage.message.includes("<funcx>")) {
+      
+      if (lastAIMessage.message.includes("funcx>") && !lastAIMessage.message.includes("<funcx>") && !lastAIMessage.message.includes("</funcx>")) {
+        
         // Correct "funcx>" to "<funcx>"
         lastAIMessage.message = lastAIMessage.message.replace(/funcx>/g, "<funcx>");
       
+        //LETS DO A SPLIT HERE, SPLIT BY <FUNCX> NUMBER [0] WILL BE KEPT AS TEXT MESSAGE AND NUMBER [1] WILL BE KEPT AS SCRIPT
+
         // Move message content to codingMessage
         setCodingMessage(lastAIMessage.message);
         setIsCoding(true);
