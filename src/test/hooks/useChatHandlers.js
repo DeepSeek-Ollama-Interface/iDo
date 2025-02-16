@@ -11,7 +11,7 @@ export default function useChatHandlers() {
   const [showThinkingMessages, setShowThinkingMessages] = useState(false);
   const [isCoding, setIsCoding] = useState(false);
   const [showReasoningMessageHistory, setShowReasoningMessageHistory] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("deepseek-r1:1.5b");
+  const [selectedModel, setSelectedModel] = useState("ChatGPTapi~gpt-4o-mini");
   
   const containerRef = useRef(null);
   const thinkingScrollRed = useRef(null);
@@ -137,7 +137,7 @@ export default function useChatHandlers() {
     }
   }, [messages]);
 
-  const handleUserMessage = useCallback((msg) => {
+  const handleUserMessage = useCallback((msg, fake = false) => {
     setIsLoading(true);
     const newUserMessage = { message: msg, author: "user", role: "user" };
     
@@ -156,7 +156,12 @@ export default function useChatHandlers() {
           },
         })
       );
-      return updatedMessages;
+      if(!fake){
+        return updatedMessages;
+      } else {
+        return prev;
+      }
+      
     });
     
     scrollToBottom();
@@ -181,34 +186,15 @@ export default function useChatHandlers() {
 
     setMessages((prev) => {
       const updatedMessages = [...prev, systemMessage];
-      // const filteredMessages = updatedMessages.filter(
-      //   (m) => m.author.toLowerCase() !== "informations"
-      // );
-
-      // console.dir({
-      //   detail: {
-      //     messages: filteredMessages,
-      //     stream: true,
-      //     model: selectedModel
-      //   },
-      // });
-      
-      // document.dispatchEvent(
-      //   new CustomEvent("AskAI", {
-      //     detail: {
-      //       messages: filteredMessages,
-      //       stream: true,
-      //       model: selectedModel
-      //     },
-      //   })
-      // );
       return updatedMessages;
     });
+
+    handleUserMessage('', true);
 
   }, []);
 
   useEffect(() => {
-    const savedModel = localStorage.getItem("selectedModel") || "deepseek-r1:1.5b";
+    const savedModel = localStorage.getItem("selectedModel") || "ChatGPTapi~gpt-4o-mini";
     setSelectedModel(savedModel);
   }, []);
 
