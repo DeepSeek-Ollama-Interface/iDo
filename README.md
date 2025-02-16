@@ -1,7 +1,7 @@
-# OFFLINE A.I. 100% Privacy
+# iDO 1.0.2 Ollama Deepseek or chatgpt api 100% Privacy & File management functions
 
-[![Windows](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/windows.png?raw=true)](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/1.0.1-hotfix/iDO-win32-x64.zip) 
-[![Linux](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/linux.png?raw=true)](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/1.0.1-hotfix/iDo-linux-x64.zip) 
+[![Windows](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/windows.png?raw=true)](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/1.0.2/iDo-1.0.2-win32-x86_64.zip) 
+[![Linux](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/linux.png?raw=true)](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/1.0.2/iDo-1.0.2-linux-x86_64.zip) 
 [![Donate](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/donate.png?raw=true)](https://www.paypal.com/paypalme/evilself) 
 
 **Ollama Deepseek Interface** is a powerful and intuitive desktop application that allows you to run **Deepseek-r1** locally on your PC. This interface enables you to access and manage your files effortlessly, while also providing you with an advanced **voice assistant** feature for smoother interaction. All functionality is optimized to ensure a seamless experience for users.
