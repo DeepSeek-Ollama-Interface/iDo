@@ -6,39 +6,31 @@ const isWindows = platform === 'win32';
 
 // Sanitize with fire
 export function sanitizePath(inputPath) {
-
     if (typeof inputPath !== 'string') {
         throw new Error('Path must be a string');
     }
 
-    // Handle relative paths and dot notation
-    let resolvedPath = inputPath
-        .replace(/^\.(?=$|\/)/, process.cwd()) // Handle leading dot
-        .replace(/(\\)/g, '/') // Normalize to forward slashes first
-        .replace(/\/+/g, '/'); // Remove duplicate slashes
+    let resolvedPath = inputPath.trim();
 
-    // If windows
+    // Normalize path separators based on OS
     if (isWindows) {
-        resolvedPath = resolvedPath
-            .replace(/\//g, '\\')
-            .replace(/^\\/, ''); // Remove leading slash for Windows
+        resolvedPath = resolvedPath.replace(/\//g, '\\'); // Convert to Windows format
     } else {
-        resolvedPath = resolvedPath.replace(/\\/g, '/');
+        resolvedPath = resolvedPath.replace(/\\/g, '/');  // Convert to Linux format
     }
 
-    // Validate path characters
-    const invalidChars = isWindows 
-        ? /[<>:"|?*]/ 
-        : /[\0]/;
+    // Ensure Windows paths start with a drive letter (e.g., C:\)
+    if (isWindows && !/^[a-zA-Z]:\\/.test(resolvedPath)) {
+        throw new Error(`Invalid Windows path: ${resolvedPath}`);
+    }
+
+    // Ensure no invalid characters
+    const invalidChars = isWindows ? /[<>:"|?*]/ : /[\0]/;
     if (invalidChars.test(resolvedPath)) {
         throw new Error(`Path contains invalid characters: ${resolvedPath}`);
     }
 
-    // Check absolute path
-    if (!path.isAbsolute(resolvedPath)) {
-        resolvedPath = path.resolve(process.cwd(), resolvedPath);
-    }
-
+    // Normalize the path safely
     return path.normalize(resolvedPath);
 }
 
