@@ -4,7 +4,6 @@ import { platform } from 'process';
 
 const isWindows = platform === 'win32';
 
-// Sanitize with fire
 export function sanitizePath(inputPath) {
     if (typeof inputPath !== 'string') {
         throw new Error('Path must be a string');
@@ -13,11 +12,7 @@ export function sanitizePath(inputPath) {
     let resolvedPath = inputPath.trim();
 
     // Normalize path separators based on OS
-    if (isWindows) {
-        resolvedPath = resolvedPath.replace(/\//g, '\\'); // Convert to Windows format
-    } else {
-        resolvedPath = resolvedPath.replace(/\\/g, '/');  // Convert to Linux format
-    }
+    resolvedPath = path.normalize(resolvedPath);
 
     // Ensure Windows paths start with a drive letter (e.g., C:\)
     if (isWindows && !/^[a-zA-Z]:\\/.test(resolvedPath)) {
@@ -25,13 +20,12 @@ export function sanitizePath(inputPath) {
     }
 
     // Ensure no invalid characters
-    const invalidChars = isWindows ? /[<>:"|?*]/ : /[\0]/;
+    const invalidChars = isWindows ? /[<>:"|?*]/g : /[\0]/g;
     if (invalidChars.test(resolvedPath)) {
         throw new Error(`Path contains invalid characters: ${resolvedPath}`);
     }
 
-    // Normalize the path safely
-    return path.normalize(resolvedPath);
+    return resolvedPath;
 }
 
 export async function listAll(inputPath) {
