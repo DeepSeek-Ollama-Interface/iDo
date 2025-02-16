@@ -82,9 +82,18 @@ function Home() {
         completedCode += "x>";
         setIsCoding(false);
         console.dir(completedCode);
+      
+        // Ensure the final result starts with "import { ..."
+        if (!completedCode.startsWith("import {")) {
+          completedCode = "import " + completedCode.trimStart();
+        }
+
+        console.log(completedCode);
+      
         const event = new CustomEvent("executeFunction", { detail: completedCode });
         document.dispatchEvent(event);
       }
+      
     }    
 
     if (isThinking) {
@@ -137,7 +146,7 @@ function Home() {
 
     if (lastAIMessageIndex !== -1) {
       lastAIMessage = messages[messages.length - 1 - lastAIMessageIndex];
-    
+
       if (lastAIMessage.message.includes("<funcx>") && !lastAIMessage.message.includes("</funcx>")) {
         // Move message content to codingMessage
         setCodingMessage(lastAIMessage.message);
@@ -146,6 +155,17 @@ function Home() {
         // Remove the last AI message from messages
         setMessages((prevMessages) => prevMessages.filter((_, index) => index !== messages.length - 1 - lastAIMessageIndex));
       }
+      if (lastAIMessage.message.includes("funcx>") && !lastAIMessage.message.includes("<funcx>")) {
+        // Correct "funcx>" to "<funcx>"
+        lastAIMessage.message = lastAIMessage.message.replace(/funcx>/g, "<funcx>");
+      
+        // Move message content to codingMessage
+        setCodingMessage(lastAIMessage.message);
+        setIsCoding(true);
+      
+        // Remove the last AI message from messages
+        setMessages((prevMessages) => prevMessages.filter((_, index) => index !== messages.length - 1 - lastAIMessageIndex));
+      }      
     }    
 
     if (lastAIMessage && lastAIMessage.message && lastAIMessage.message.includes("<think>") && !lastAIMessage.message.includes("</think>")) {
@@ -254,20 +274,12 @@ function Home() {
 
     setMessages((prevMessages) => [...prevMessages, systemMessage]);
 
-    const filteredMessages = [...messages, systemMessage].filter(
-      (m) => m.author.toLowerCase() !== "informations"
-    );
-
-    document.dispatchEvent(
-      new CustomEvent("AskAI", {
-        detail: {
-          messages: filteredMessages,
-          stream: true,
-          model: selectedModel,
-        },
-      })
-    );
   };
+
+  useEffect(() => {
+    const savedModel = localStorage.getItem("selectedModel") || "deepseek-r1:1.5b";
+    setSelectedModel(savedModel);
+  }, []);  
 
   useEffect(() => {
     window.electron.StreamEND(handleStreamEND);
@@ -291,7 +303,11 @@ function Home() {
         <select
           className="select w-full bg-surface text-text border-muted focus:border-muted focus:ring-0 outline-none"
           value={selectedModel}
-          onChange={(e) => setSelectedModel(e.target.value)}
+          onChange={(e) => {
+            const newModel = e.target.value;
+            setSelectedModel(newModel);
+            localStorage.setItem("selectedModel", newModel);
+          }}
         >
           {modelVariants.map((model) => (
             <option key={model} value={model}>

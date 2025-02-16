@@ -11,7 +11,7 @@ function Root() {
   const isSettingsPage = location.pathname === "/settings";
 
   return (
-    <div className="h-screen w-full flex flex-col">
+    <div className="h-screen w-full flex flex-col" style={{ overflow: "hidden" }}>
       {isSettingsPage ? <CustomTitlebarSettings /> : <CustomTitlebar />}
       <App />
     </div>

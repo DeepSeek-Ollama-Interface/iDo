@@ -188,9 +188,9 @@ function validateInput(opts) {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 500,
+    width: 470,
     height: 700,
-    minWidth: 400,
+    minWidth: 470,
     minHeight: 400,
     icon: path.join(__dirname, '../build/icons/icon.png'),
     frame: false,
