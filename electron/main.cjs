@@ -48,7 +48,9 @@ function updateElectronApp(opts = {}) {
   if (app.isReady()) {
     initUpdater(safeOpts);
   } else {
-    app.on('ready', () => initUpdater(safeOpts));
+    app.on('ready', () => {
+      initUpdater(safeOpts);
+  });
   }
 }
 

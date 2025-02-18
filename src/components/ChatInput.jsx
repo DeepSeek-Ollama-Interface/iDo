@@ -1,4 +1,5 @@
-import { DefIcon, MuteIcon, StopIcon, SendIcon } from '../icons';
+import { useState } from "react";
+import { MicOff, MicOn, VolumeOff, VolumeOn, StopIcon, SendIcon } from '../icons';
 
 export default function ChatInput({
   userMessage,
@@ -6,20 +7,30 @@ export default function ChatInput({
   handleUserMessage,
   forceStreamEND
 }) {
+
+  const [isListening, setIsListening] = useState(false);
+
+  const startListening = () => {
+    setIsListening(true);
+
+    setTimeout(() => { setIsListening(false) }, 5000); // TESTING MICROPHONE ICON
+  };
+
   return (
     <div className="flex items-center gap-2 p-2 m-2 bg-[#383A40] rounded-xl">
-      <button 
+      <button
       className="cursor-pointer p-2 bg-[#B5BAC1] hover:bg-[#DBDEE1] transition duration-300 text-text focus:ring-0 outline-none rounded-full"
       title='Stop the sound'
       >
-        <DefIcon />
+        <VolumeOff />
       </button>
 
       <button 
+      onClick={startListening}
       className="cursor-pointer p-2 bg-[#B5BAC1] hover:bg-[#DBDEE1] transition duration-300 text-text focus:ring-0 outline-none rounded-full"
       title='Listen your microphone'
       >
-        <MuteIcon />
+        {isListening ? <MicOn /> : <MicOff />}
       </button>
 
       <input
