@@ -199,6 +199,11 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      webSecurity: false,
+      allowRunningInsecureContent: true,
+      enableRemoteModule: true,
+      enableBlinkFeatures: "SpeechRecognition",
+      sandbox: false,
       preload: path.join(__dirname, 'preload.js'),
     },
   });

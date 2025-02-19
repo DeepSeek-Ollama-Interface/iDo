@@ -11,9 +11,25 @@ export default function ChatInput({
   const [isListening, setIsListening] = useState(false);
 
   const startListening = () => {
-    setIsListening(true);
+    if (!("webkitSpeechRecognition" in window)) {
+      alert("Browser-ul tău nu suportă Speech Recognition!");
+      return;
+    }
 
-    setTimeout(() => { setIsListening(false) }, 5000); // TESTING MICROPHONE ICON
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.lang = "ro-RO"; // Limba română
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setUserMessage(transcript); // Setează textul în input
+      console.log("Text recunoscut:", transcript);
+    };
+
+    recognition.onerror = (event) => console.error("Eroare:", event.error);
+
+    recognition.start();
   };
 
   return (
