@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { MicOff, MicOn, VolumeOff, VolumeOn, StopIcon, SendIcon } from "../icons";
 
 export default function ChatInput({
@@ -10,6 +10,7 @@ export default function ChatInput({
   const [isListening, setIsListening] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const textareaRef = useRef(null);
 
   // Start recording
   const startRecording = async () => {
@@ -98,6 +99,29 @@ export default function ChatInput({
     reader.readAsDataURL(audioBlob); // Convert to Base64
   };  
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      // Just add a new line, no action on "Enter" alone
+      e.preventDefault(); // Prevent default action to avoid form submission
+      setUserMessage(userMessage + "\n"); // Add a new line in the input
+    }
+
+    if (e.key === "Enter" && e.shiftKey) {
+      e.preventDefault(); // Prevent default Enter behavior (new line)
+      if (userMessage.trim()) {
+        handleUserMessage(userMessage);
+        setUserMessage(""); // Clear the input after sending the message
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [userMessage]);
+
   return (
     <div className="flex items-center gap-2 p-2 m-2 bg-[#383A40] rounded-xl">
       <button
@@ -116,13 +140,15 @@ export default function ChatInput({
         {isListening ? <MicOn /> : <MicOff />}
       </button>
 
-      <input
+      <textarea
+        ref={textareaRef}
         type="text"
         value={userMessage}
         onChange={(e) => setUserMessage(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && userMessage.trim() && handleUserMessage(userMessage)}
+        onKeyDown={handleKeyDown}
         className="w-full p-2 border-none focus:ring-0 outline-none"
         placeholder="Write a message..."
+        rows={1}
       />
 
       <button

@@ -12,8 +12,39 @@ const pkg = require('../package.json');
 const userAgent = format('%s/%s (%s: %s)', pkg.name, pkg.version, os.platform(), os.arch());
 const supportedPlatforms = ['linux', 'win32'];
 const { nodewhisper } = require('nodejs-whisper');
-const { execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 
+async function runOllamaProcess() {
+  try {
+      const command = 'ollama';
+      const args = ['serve'];
+
+      const child = spawn(command, args, {
+          stdio: 'inherit', // Inherit stdio to see logs in the terminal
+          detached: false, // Keep process tied to the parent
+      });
+
+      console.log(`Ollama started with PID: ${child.pid}`);
+
+      child.on('error', (err) => {
+          console.error(`PROCESS ERROR: ${err.message}`);
+      });
+
+      child.on('exit', (code, signal) => {
+          console.log(`PROCESS EXITED with code ${code}, signal: ${signal}`);
+      });
+
+      process.on('SIGINT', () => {
+          console.log('Stopping Ollama...');
+          child.kill('SIGINT'); // Gracefully stop the process
+          process.exit();
+      });
+
+      return child.pid;
+  } catch (error) {
+      return null;
+  }
+}
 
 // const isDev = process.env.NODE_ENV === 'development';
 const isDev = false;
@@ -387,8 +418,11 @@ ipcMain.on('alwaysOnTop', () => {
 
 async function runOllama() {
   try {
-    const backend = await import('../backend/export.mjs');
-    return await backend.runOllama();
+    const res = await runOllamaProcess();
+    if(!res){
+      console.error('Failed to run Ollama:', error);
+      shell.openExternal('https://ollama.com/');
+    }
   } catch (error) {
     console.error('Failed to run Ollama:', error);
     shell.openExternal('https://ollama.com/');

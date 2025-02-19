@@ -85,48 +85,67 @@ class InjectPromptCore {
 
 
   async analyzeResponse(script) {
-    console.dir("*******************");
     console.dir(script);
-
+  
     const backendPath = path.join(process.cwd(), 'backend');
     const scriptPath = path.join(backendPath, 'temp.mjs');
-
+  
     // Ensure backend directory exists
     if (!fs.existsSync(backendPath)) {
       fs.mkdirSync(backendPath, { recursive: true });
     }
-
+  
     // Write script to temp.js
     fs.writeFileSync(scriptPath, script);
-
-    return new Promise((resolve) => {
+  
+    return new Promise((resolve, reject) => {
       const child = spawn('node', [scriptPath], { cwd: backendPath });
-
+  
       let stdoutData = '';
       let stderrData = '';
-
+  
       child.stdout.on('data', (data) => {
         stdoutData += data.toString();
       });
-
+  
       child.stderr.on('data', (data) => {
         stderrData += data.toString();
       });
-
+  
       child.on('close', (code) => {
         const result = {
           exitCode: code,
           stdout: stdoutData.trim(),
           stderr: stderrData.trim(),
         };
-
+  
         // Cleanup temp.js
         fs.unlinkSync(scriptPath);
-
+  
         resolve(JSON.stringify(result));
+      });
+  
+      // Timeout after 60 seconds
+      const timeout = setTimeout(() => {
+        child.kill('SIGKILL');  // Force kill the process
+        const result = {
+          exitCode: 'timeout',
+          stdout: stdoutData,
+          stderr: `Process was killed after 60 seconds due to timeout. STDERR: ${stderrData}`,
+        };
+        // Cleanup temp.js
+        fs.unlinkSync(scriptPath);
+        reject(JSON.stringify(result));
+      }, 60000);  // 60 seconds
+  
+      // Clear timeout if process finishes within 60 seconds
+      child.on('close', () => {
+        clearTimeout(timeout);
       });
     });
   }
+ 
+
 }
 
 export { InjectPromptCore };
