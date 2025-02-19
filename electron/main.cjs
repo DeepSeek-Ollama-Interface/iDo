@@ -279,30 +279,17 @@ ipcMain.on('minimize', () => mainWindow.minimize());
 ipcMain.on('maximize', () => mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize());
 ipcMain.on('close', () => mainWindow.close());
 
-// Function to handle transcription using Whisper
-async function transcribeAudio(filePath) {
-  try {
-    const transcriptionData = await whisper(filePath, {
-      output_format: 'json',  // You can customize the output format here
-      output_dir: path.join(__dirname, 'subtitles'),  // Specify the output directory
-    });
+ipcMain.handle("transcribe-audio", async (_, audioData) => {
+  const filePath = path.join(__dirname, "audio.webm");
+  fs.writeFileSync(filePath, Buffer.from(audioData));
 
-    console.log('Transcription successful:', transcriptionData);
-    const jsonContent = await transcriptionData.json.getContent();
-    return jsonContent;  // Return the transcription result
-  } catch (error) {
-    console.error('Error in transcribing audio:', error);
-    throw error;
-  }
-}
-
-// Register an IPC listener to process audio transcription from renderer process
-ipcMain.handle('transcribeAudio', async (event, filePath) => {
+  // Call your transcription function (Whisper)
   try {
-    const transcription = await transcribeAudio(filePath);
+    const transcription = await transcribeWithWhisper(filePath);
     return transcription;
-  } catch (error) {
-    return { error: error.message };
+  } catch (err) {
+    console.error("Transcription error:", err);
+    return "Error transcribing audio.";
   }
 });
 

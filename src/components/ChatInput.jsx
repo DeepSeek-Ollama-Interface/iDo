@@ -60,24 +60,18 @@ export default function ChatInput({
     }
   };
 
-  // Send the recorded audio to Whisper for offline transcription
   const sendAudioToWhisper = async (audioBlob) => {
     const audioFile = new File([audioBlob], "audio.webm");
-
+  
     // Save the audio to a local path
     const reader = new FileReader();
     reader.onloadend = async () => {
       const arrayBuffer = reader.result;
-      const buffer = Buffer.from(arrayBuffer);
-
-      // Save the buffer as a file in a temporary location
-      const fs = require('fs');
-      const filePath = '/home/kkk/Desktop/iDo/dist/audio.webm';
-      fs.writeFileSync(filePath, buffer);
-
-      // Now call the Electron main process to transcribe the audio
+      const uint8Array = new Uint8Array(arrayBuffer);
+  
+      // Send to Electron's main process
       try {
-        const transcription = await window.electron.transcribeAudio(filePath);
+        const transcription = await window.electron.transcribeAudio(uint8Array);
         setUserMessage(transcription);
         console.log("Transcribed Text:", transcription);
       } catch (err) {
@@ -85,7 +79,7 @@ export default function ChatInput({
       }
     };
     reader.readAsArrayBuffer(audioFile);
-  };
+  };  
 
   return (
     <div className="flex items-center gap-2 p-2 m-2 bg-[#383A40] rounded-xl">

@@ -19,7 +19,7 @@ contextBridge.exposeInMainWorld("electron", {
   cpuUsageResult: (callback) => ipcRenderer.on("cpuUsageResult", callback),
   readFile: (filePath) => ipcRenderer.invoke("read-file", filePath),
   writeFile: (filePath, content) => ipcRenderer.invoke("write-file", filePath, content),
-  transcribeAudio: (filePath) => ipcRenderer.invoke("transcribeAudio", filePath),
+  transcribeAudio: (audioData) => ipcRenderer.invoke("transcribe-audio", audioData),
 });
 
 ipcRenderer.on("ResponseAIIPC", (event, data) => {

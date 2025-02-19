@@ -14,13 +14,16 @@ import { Packer, Document, Paragraph, TextRun } from 'docx';
 async function listAll(basePath) {
     try {
         const entries = await fs.readdir(basePath, { withFileTypes: true });
-        return entries.map(dirent => ({
+        const result = entries.map(dirent => ({
             name: dirent.name,
             path: path.join(basePath, dirent.name),
             isDirectory: dirent.isDirectory(),
             isFile: dirent.isFile()
         }));
+        console.log("listAll result:", result);
+        return result;
     } catch (error) {
+        console.error(`Error in listAll(${basePath}):`, error);
         return [];
     }
 }
@@ -51,14 +54,17 @@ async function listDirectories(basePath) {
 async function listFiles(basePath) {
     try {
         const entries = await fs.readdir(basePath, { withFileTypes: true });
-        return entries
+        const result = entries
             .filter(dirent => dirent.isFile())
             .map(dirent => ({
                 name: dirent.name,
                 path: path.join(basePath, dirent.name),
                 isFile: true
             }));
+        console.log("listFiles result:", result);
+        return result;
     } catch (error) {
+        console.error(`Error in listFiles(${basePath}):`, error);
         return [];
     }
 }
@@ -210,6 +216,7 @@ export async function readDocx(filePath) {
 export async function readFile(filePath) {
     try {
         const content = await fs.readFile(filePath, 'utf8');
+        console.log(`readFile(${filePath}):`, content);
         return content;
     } catch (error) {
         console.error(`Error reading file ${filePath}:`, error);
