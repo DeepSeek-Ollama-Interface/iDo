@@ -18,12 +18,12 @@ export default function ChatInput({
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
 
-      audioChunksRef.current = [];
+      audioChunksRef.current = []; // Reset chunks array
 
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           console.log("Audio chunk received:", event.data);
-          audioChunksRef.current.push(event.data);
+          audioChunksRef.current.push(event.data); // Collect chunks
         } else {
           console.warn("Empty audio chunk received, skipping...");
         }
@@ -31,21 +31,32 @@ export default function ChatInput({
 
       mediaRecorder.onstop = async () => {
         setIsListening(false);
+        console.log("Recording stopped.");
+        console.log("Chunks collected:", audioChunksRef.current.length);
 
         if (audioChunksRef.current.length === 0) {
           console.error("No audio recorded.");
           return;
         }
 
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        // Combine all chunks into one blob
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         console.log("Final audio blob:", audioBlob);
 
-        await sendAudioToWhisper(audioBlob);
+        // Send the blob to Whisper for transcription
+        try {
+          await sendAudioToWhisper(audioBlob);
+        } catch (error) {
+          console.error("Error transcribing audio:", error);
+        }
+
+        // Clear chunks array after sending
         audioChunksRef.current = [];
       };
 
       mediaRecorderRef.current = mediaRecorder;
       mediaRecorder.start(1000); // Collect chunks every second
+
       console.log("Recording started...");
     } catch (error) {
       console.error("Error accessing microphone:", error);
@@ -53,32 +64,38 @@ export default function ChatInput({
     }
   };
 
-  // Stop recording
+  // Stop recording manually
   const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      mediaRecorderRef.current.stop();
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      mediaRecorderRef.current.stop(); // Stop the recording
+      console.log("Recording stopped manually.");
+    } else {
+      console.log("Recording already stopped or not started yet.");
     }
   };
 
   const sendAudioToWhisper = async (audioBlob) => {
-    const audioFile = new File([audioBlob], "audio.webm");
-  
-    // Save the audio to a local path
     const reader = new FileReader();
     reader.onloadend = async () => {
-      const arrayBuffer = reader.result;
-      const uint8Array = new Uint8Array(arrayBuffer);
-  
-      // Send to Electron's main process
       try {
-        const transcription = await window.electron.transcribeAudio(uint8Array);
-        setUserMessage(transcription);
+        const base64Audio = reader.result.split(",")[1]; // Extract Base64 content
+  
+        console.log("Base64 Audio:", base64Audio.slice(0, 100)); // Log first 100 chars
+  
+        // Ensure it's a string before sending
+        if (typeof base64Audio !== "string") {
+          console.error("Base64 conversion failed");
+          return;
+        }
+  
+        const transcription = await window.electron.transcribeAudio(base64Audio);
         console.log("Transcribed Text:", transcription);
       } catch (err) {
         console.error("Error transcribing audio:", err);
       }
     };
-    reader.readAsArrayBuffer(audioFile);
+  
+    reader.readAsDataURL(audioBlob); // Convert to Base64
   };  
 
   return (

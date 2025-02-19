@@ -11,7 +11,9 @@ const process = require('process');
 const pkg = require('../package.json');
 const userAgent = format('%s/%s (%s: %s)', pkg.name, pkg.version, os.platform(), os.arch());
 const supportedPlatforms = ['linux', 'win32'];
-const whisper = require('node-whisper');
+const { nodewhisper } = require('nodejs-whisper');
+const { execSync } = require('child_process');
+
 
 // const isDev = process.env.NODE_ENV === 'development';
 const isDev = false;
@@ -24,6 +26,33 @@ const UpdateSourceType = {
   ElectronPublicUpdateService: 'ElectronPublicUpdateService',
   StaticStorage: 'StaticStorage',
 };
+
+async function transcribeWithWhisper(filePath) {
+  try {
+    console.log(`🎤 Transcribing file: ${filePath}`);
+
+    const transcription = await nodewhisper(filePath, {
+      modelName: 'base.en',
+      autoDownloadModelName: 'base.en',
+      removeWavFileAfterTranscription: false,
+      withCuda: false,
+      logger: console,
+      execPath: process.execPath, // ✅ Explicitly set the Node.js binary path
+      whisperOptions: {
+        outputInText: true,
+        outputInJson: false,
+        outputInSrt: false,
+        translateToEnglish: false,
+      },
+    });
+
+    console.log("✅ Transcription Result:", transcription);
+    return transcription;
+  } catch (error) {
+    console.error('❌ Error in Whisper Transcription:', error.message);
+    throw new Error('Transcription failed');
+  }
+}
 
 function isHttpsUrl(maybeURL) {
   try {
@@ -249,6 +278,8 @@ function toggleSettingsWindow() {
   }
 }
 
+app.disableHardwareAcceleration();
+
 app.whenReady().then(() => {
   createWindow();
 
@@ -279,17 +310,36 @@ ipcMain.on('minimize', () => mainWindow.minimize());
 ipcMain.on('maximize', () => mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize());
 ipcMain.on('close', () => mainWindow.close());
 
-ipcMain.handle("transcribe-audio", async (_, audioData) => {
-  const filePath = path.join(__dirname, "audio.webm");
-  fs.writeFileSync(filePath, Buffer.from(audioData));
-
-  // Call your transcription function (Whisper)
+ipcMain.handle('transcribe-audio', async (event, base64Audio) => {
   try {
-    const transcription = await transcribeWithWhisper(filePath);
+    console.log("📥 Received audio data from renderer");
+
+    if (typeof base64Audio !== 'string') {
+      console.error("❌ Invalid audio data received");
+      throw new Error("Invalid audio data");
+    }
+
+    console.log("🔹 Converting Base64 to Buffer...");
+    const buffer = Buffer.from(base64Audio, 'base64');
+    const webmFilePath = path.join(__dirname, 'temp_audio.webm');
+    const wavFilePath = path.join(__dirname, 'temp_audio.wav');
+
+    fs.writeFileSync(webmFilePath, buffer);
+    console.log("💾 WebM audio file saved:", webmFilePath);
+
+    // Convert WebM to WAV (Required for Whisper)
+    console.log("🎼 Converting WebM to WAV...");
+    execSync(`ffmpeg -i "${webmFilePath}" -ar 16000 -ac 1 -c:a pcm_s16le "${wavFilePath}"`);
+    console.log("✅ Conversion Complete:", wavFilePath);
+
+    console.log("🎤 Calling transcribeWithWhisper...");
+    const transcription = await transcribeWithWhisper(wavFilePath);
+
+    console.log(`✅ Transcription Result: ${transcription}`);
     return transcription;
   } catch (err) {
-    console.error("Transcription error:", err);
-    return "Error transcribing audio.";
+    console.error("❌ Error processing audio:", err);
+    throw new Error("Transcription failed");
   }
 });
 
