@@ -19,6 +19,7 @@
     "docx": "^9.1.1",
     "github-url-to-object": "^4.0.6",
     "ms": "^2.1.3",
+    "node-whisper": "^2024.11.13",
     "os-utils": "^0.0.14",
     "path": "^0.12.7",
     "process": "^0.11.10",

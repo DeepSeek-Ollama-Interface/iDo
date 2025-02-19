@@ -16,7 +16,10 @@ contextBridge.exposeInMainWorld("electron", {
   toggleSettingsWindow: (info) => ipcRenderer.send('toggleSettingsWindow', info),
   getLocalSettings: (data) => ipcRenderer.send('getLocalSettings', data),
   getCpuUsage: () => ipcRenderer.send('getCpuUsage'),
-  cpuUsageResult: (callback) => ipcRenderer.on("cpuUsageResult", callback)
+  cpuUsageResult: (callback) => ipcRenderer.on("cpuUsageResult", callback),
+  readFile: (filePath) => ipcRenderer.invoke("read-file", filePath),
+  writeFile: (filePath, content) => ipcRenderer.invoke("write-file", filePath, content),
+  transcribeAudio: (filePath) => ipcRenderer.invoke("transcribeAudio", filePath),
 });
 
 ipcRenderer.on("ResponseAIIPC", (event, data) => {

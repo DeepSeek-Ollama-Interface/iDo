@@ -11,6 +11,7 @@ const process = require('process');
 const pkg = require('../package.json');
 const userAgent = format('%s/%s (%s: %s)', pkg.name, pkg.version, os.platform(), os.arch());
 const supportedPlatforms = ['linux', 'win32'];
+const whisper = require('node-whisper');
 
 // const isDev = process.env.NODE_ENV === 'development';
 const isDev = false;
@@ -277,6 +278,41 @@ app.on('window-all-closed', () => {
 ipcMain.on('minimize', () => mainWindow.minimize());
 ipcMain.on('maximize', () => mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize());
 ipcMain.on('close', () => mainWindow.close());
+
+// Function to handle transcription using Whisper
+async function transcribeAudio(filePath) {
+  try {
+    const transcriptionData = await whisper(filePath, {
+      output_format: 'json',  // You can customize the output format here
+      output_dir: path.join(__dirname, 'subtitles'),  // Specify the output directory
+    });
+
+    console.log('Transcription successful:', transcriptionData);
+    const jsonContent = await transcriptionData.json.getContent();
+    return jsonContent;  // Return the transcription result
+  } catch (error) {
+    console.error('Error in transcribing audio:', error);
+    throw error;
+  }
+}
+
+// Register an IPC listener to process audio transcription from renderer process
+ipcMain.handle('transcribeAudio', async (event, filePath) => {
+  try {
+    const transcription = await transcribeAudio(filePath);
+    return transcription;
+  } catch (error) {
+    return { error: error.message };
+  }
+});
+
+ipcMain.handle("read-file", (event, filePath) => {
+  return fs.readFileSync(path.resolve(filePath), "utf-8");
+});
+
+ipcMain.handle("write-file", (event, filePath, content) => {
+  fs.writeFileSync(path.resolve(filePath), content, "utf-8");
+});
 
 let lastTotal = 0;
 let lastIdle = 0;
