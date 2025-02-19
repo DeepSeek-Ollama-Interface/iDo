@@ -178,11 +178,15 @@ export default function useChatHandlers() {
   }, []);
 
   const handleExecuteFunctionResponse = useCallback((event) => {
+    console.dir(event);
+
     const systemMessage = {
       message: event.detail,
       author: "system",
       role: "system",
     };
+
+    console.dir(systemMessage);
 
     setMessages((prev) => {
       const updatedMessages = [...prev, systemMessage];

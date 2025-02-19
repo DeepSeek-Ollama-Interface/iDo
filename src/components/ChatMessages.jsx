@@ -36,6 +36,48 @@ export default function ChatMessages({
           );
         }
 
+        if(msg.author.toLowerCase() === "system"){
+          try {
+            const parsedMessage = JSON.parse(msg.message); // Try to parse the JSON
+            if (parsedMessage.exitCode !== undefined && !(typeof parsedMessage.exitCode === 'string')) {
+              return (
+                <div key={index} className="flex flex-col items-start mt-2">
+                  <p className="text-sm font-semibold mb-1">{formattedAuthor}</p>
+                  <div className="p-2 rounded-lg bg-response text-text flex items-center gap-2">
+                    {parsedMessage.exitCode === 0 ? (
+                      <>
+                        ✅ <p>Operation was successful</p>
+                      </>
+                    ) : (
+                      <>
+                        ❌ <p>Operation failed, ask your A.I. why it failed</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            } else {
+              return (
+                <div key={index} className="flex flex-col items-start mt-2">
+                  <p className="text-sm font-semibold mb-1">{formattedAuthor}</p>
+                  <div className="p-2 rounded-lg bg-response text-text flex items-center gap-2">
+                    🔄 <p>Operation was a loop process</p>
+                  </div>
+                </div>
+              );
+            }
+          } catch (e) {
+            return (
+              <div key={index} className={`flex flex-col ${msg.author === "user" ? "items-end" : "items-start"} mt-2`}>
+                <p className="text-sm font-semibold mb-1">{formattedAuthor}</p>
+                <div className={`p-2 rounded-lg ${msg.author === "user" ? "bg-primary text-text" : "bg-response text-text"}`}>
+                  <p className="whitespace-pre-wrap">{msg.message}</p>
+                </div>
+              </div>
+            );
+          }
+        }
+
         return (
           <div key={index} className={`flex flex-col ${msg.author === "user" ? "items-end" : "items-start"} mt-2`}>
             <p className="text-sm font-semibold mb-1">{formattedAuthor}</p>
