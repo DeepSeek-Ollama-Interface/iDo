@@ -6,7 +6,7 @@ function CustomTitlebarSettings() {
          style={{ WebkitAppRegion: "drag"}}>
       <div className='flex flex-inline gap-2 items-center justify-center'>
         <img src={faviconDark} alt="favicon" className="w-6 h-6"/>
-        <h1>iDO - Settings</h1>
+        <h1>Settings</h1>
       </div>
 
       <div className="flex space-x-[2px] shadow-md" style={{ WebkitAppRegion: "no-drag" }}>

@@ -12,6 +12,8 @@ export default function ChatInput({
   const audioChunksRef = useRef([]);
   const textareaRef = useRef(null);
 
+  const isPremium = localStorage.getItem("premium") || false;
+
   // Start recording
   const startRecording = async () => {
     setIsListening(true);
@@ -101,16 +103,15 @@ export default function ChatInput({
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      // Just add a new line, no action on "Enter" alone
-      e.preventDefault(); // Prevent default action to avoid form submission
-      setUserMessage(userMessage + "\n"); // Add a new line in the input
+      e.preventDefault();
+      setUserMessage(userMessage + "\n");
     }
 
     if (e.key === "Enter" && e.shiftKey) {
-      e.preventDefault(); // Prevent default Enter behavior (new line)
+      e.preventDefault();
       if (userMessage.trim()) {
         handleUserMessage(userMessage);
-        setUserMessage(""); // Clear the input after sending the message
+        setUserMessage("");
       }
     }
   };
@@ -125,8 +126,9 @@ export default function ChatInput({
   return (
     <div className="flex items-center gap-2 p-2 m-2 bg-[#383A40] rounded-xl">
       <button
-        className="cursor-pointer p-2 bg-[#B5BAC1] hover:bg-[#DBDEE1] transition duration-300 text-text focus:ring-0 outline-none rounded-full"
-        title="Stop the sound"
+        disabled={!isPremium}
+        className={`cursor-pointer p-2 ${!isPremium ? `bg-[#232428]` : `bg-[#B5BAC1] hover:bg-[#DBDEE1]` } transition duration-300 text-text focus:ring-0 outline-none rounded-full`}
+        title={`${!isPremium ? `You need premium` : `Stop the sound`}`}
       >
         <VolumeOff />
       </button>
@@ -134,8 +136,9 @@ export default function ChatInput({
       <button
         onMouseDown={startRecording}
         onMouseUp={stopRecording}
-        className="cursor-pointer p-2 bg-[#B5BAC1] hover:bg-[#DBDEE1] transition duration-300 text-text focus:ring-0 outline-none rounded-full"
-        title="Listen to your microphone"
+        disabled={!isPremium}
+        className={`cursor-pointer p-2 ${!isPremium ? `bg-[#232428]` : `bg-[#B5BAC1] hover:bg-[#DBDEE1]` } transition duration-300 text-text focus:ring-0 outline-none rounded-full`}
+        title={`${!isPremium ? `You need premium` : `Listen to your microphone`}`}
       >
         {isListening ? <MicOn /> : <MicOff />}
       </button>

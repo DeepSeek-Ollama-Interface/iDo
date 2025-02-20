@@ -40,9 +40,9 @@ function CustomTitlebar() {
   return (
     <div className="w-full h-6 titleBarColor text-text flex items-center select-none px-2 py-4" style={{ WebkitAppRegion: "drag"}}>
 
-      <div className='flex flex-inline items-center justify-center'>
+      {/* <div className='flex flex-inline items-center justify-center'>
         <img src={faviconDark} alt="favicon" className="w-6 h-6"/>
-      </div>
+      </div> */}
 
       <div className='flex flex-inline items-center justify-center' style={{ WebkitAppRegion: "no-drag" }}>
         {/* <img src={faviconDark} alt="favicon" className="w-6 h-6"/>

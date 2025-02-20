@@ -1,22 +1,18 @@
-import { useState, useEffect } from "react";
-import { User, Ai, About } from "../icons";
-import AiSettings from "./settings/AiSettings";
-import UserSettings from "./settings/UserSettings";
-import AboutPage from "./settings/AboutPage";
+import { useState } from "react";
+// import { FaUser, FaBrain, FaInfoCircle } from "react-icons/fa";
+import {User, Ai, About} from "../icons";
 
-function Settings() {
+function Sidebar() {
   const [active, setActive] = useState("User");
-  
+
   const menuItems = [
-    { name: "User", icon: <User />, page: <UserSettings /> },
-    { name: "AI", icon: <Ai />, page: <AiSettings /> },
-    { name: "About", icon: <About />, page: <AboutPage /> },
+    { name: "User", icon: <User /> },
+    { name: "AI", icon: <Ai /> },
+    { name: "About", icon: <About /> },
   ];
 
   return (
-    <div className="h-screen w-full">
     <div className="flex">
-      {/* Navbar lateral */}
       <nav className="h-screen w-48 bg-[#2B2D31] text-[#B5BAC1] flex flex-col p-2 border-r border-[#1E1F22]">
         <h2 className="text-xl font-bold mb-6">Menu</h2>
         {menuItems.map((item) => (
@@ -33,13 +29,13 @@ function Settings() {
         ))}
       </nav>
 
-      {/* Conținutul principal care se schimbă dinamic */}
-      <div className="flex-1 p-6 bg-[#313338]">
-        {menuItems.find((item) => item.name === active)?.page}
+      {/* Main Content */}
+      <div className="flex-1 p-6 bg-[#313338">
+        <h1 className="text-2xl font-bold">{active} Page</h1>
+        <p>Continut pentru pagina {active}.</p>
       </div>
     </div>
-  </div>
   );
 }
 
-export default Settings;
+export default Sidebar;

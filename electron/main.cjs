@@ -283,8 +283,8 @@ function toggleSettingsWindow() {
     settingsWindow = null;
   } else {
     settingsWindow = new BrowserWindow({
-      width: 400,
-      height: 500,
+      width: 500,
+      height: 600,
       icon: path.join(__dirname, '../build/icons/icon.png'),
       resizable: false,
       frame: false,
