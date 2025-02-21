@@ -17,8 +17,8 @@ function Settings() {
     <div className="h-screen w-full">
     <div className="flex">
       {/* Navbar lateral */}
-      <nav className="h-screen w-48 bg-[#2B2D31] text-[#B5BAC1] flex flex-col p-2 border-r border-[#1E1F22]">
-        <h2 className="text-xl font-bold mb-6">Menu</h2>
+      <nav className="h-screen w-40 bg-[#2B2D31] text-[#B5BAC1] flex flex-col p-2 border-r border-[#1E1F22]">
+        <h2 className="text-xl font-bold mb-6 text-center">Settings</h2>
         {menuItems.map((item) => (
           <button
             key={item.name}

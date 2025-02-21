@@ -1,9 +1,14 @@
 {
   "name": "deepseek-ollama-interface",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.3",
+  "author": "OxiJenuuu / B1TV-670",
   "main": "./electron/main.cjs",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DeepSeek-Ollama-Interface/iDo"
+  },
   "scripts": {
     "lint": "eslint .",
     "dev": "npm run build && cross-env NODE_ENV=development concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
