@@ -1,1 +1,0 @@
-Salut! Acesta este un text scris in fisierul text.txt.
