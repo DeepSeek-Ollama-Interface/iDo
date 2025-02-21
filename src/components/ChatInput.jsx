@@ -102,12 +102,12 @@ export default function ChatInput({
   };  
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && e.shiftKey) {
       e.preventDefault();
       setUserMessage(userMessage + "\n");
     }
 
-    if (e.key === "Enter" && e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (userMessage.trim()) {
         handleUserMessage(userMessage);
