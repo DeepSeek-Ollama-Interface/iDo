@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect } from "react";
 
 export default function ChatMessages({
   messages,
@@ -11,13 +11,11 @@ export default function ChatMessages({
   setShowReasoningMessageHistory,
   isCoding,
   isLoading,
-  thinkingScrollRed,
-  forceUpdate
+  thinkingScrollRed
 }) {
-
   useEffect(() => {
     console.dir(messages);
-  }, [messages, forceUpdate]);
+  }, [messages]);
 
   return (
     <div className="flex-grow overflow-y-auto p-4" ref={containerRef}>
@@ -46,8 +44,8 @@ export default function ChatMessages({
 
         if(msg.author.toLowerCase() === "system"){
           try {
-            const parsedMessage = (typeof msg.message === 'string') ? JSON.parse(msg.message) : msg.message; // Try to parse the JSON
-            if ((typeof msg.message === 'object') && parsedMessage.exitCode !== undefined && !(typeof parsedMessage.exitCode === 'string')) {
+            const parsedMessage = JSON.parse(msg.message); // Try to parse the JSON
+            if (parsedMessage.exitCode !== undefined && !(typeof parsedMessage.exitCode === 'string')) {
               return (
                 <div key={index} className="flex flex-col items-start mt-2">
                   <p className="text-sm font-semibold mb-1">{formattedAuthor}</p>

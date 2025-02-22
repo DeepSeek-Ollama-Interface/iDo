@@ -3,10 +3,6 @@ import useChatHandlers from "../hooks/useChatHandlers";
 
 const ChatHistory = () => {
   const {
-    setChatId,
-    setMessages,
-    setThinkingMessages,
-    setSelectedModel,
     loadChatById, // Now using the function to load chat data
   } = useChatHandlers();
 

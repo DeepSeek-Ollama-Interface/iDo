@@ -1,9 +1,9 @@
-import { useState, useEffect, useReducer } from "react";
-import useChatHandlers from "../hooks/useChatHandlers";
-import ModelSelect from "../components/ModelSelect";
-import ChatHistory from "../components/ChatHistory";
-import ChatMessages from "../components/ChatMessages";
-import ChatInput from "../components/ChatInput";
+import { useState, useEffect } from 'react';
+import useChatHandlers from '../hooks/useChatHandlers';
+import ModelSelect from '../components/ModelSelect';
+import ChatMessages from '../components/ChatMessages';
+import ChatInput from '../components/ChatInput';
+import ChatHistory from '../components/ChatHistory';
 
 export default function Home() {
   const {
@@ -24,38 +24,35 @@ export default function Home() {
     forceStreamEND,
     toggleThinkingMessages,
     setShowReasoningMessageHistory,
-    forceUpdate
+    loadChatById
   } = useChatHandlers();
 
   return (
-    <div className="h-[94%] w-full flex">
-      <ChatHistory />
+    <div className="h-[96%] w-full flex flex-col">
+      <ChatHistory loadChatById={loadChatById} />
 
-      <div className="flex flex-col flex-grow">
-        <ModelSelect selectedModel={selectedModel} setSelectedModel={setSelectedModel} />
+      <ModelSelect selectedModel={selectedModel} setSelectedModel={setSelectedModel} />
+      
+      <ChatMessages
+        messages={messages}
+        containerRef={containerRef}
+        isThinking={isThinking}
+        thinkingMessages={thinkingMessages}
+        showThinkingMessages={showThinkingMessages}
+        toggleThinkingMessages={toggleThinkingMessages}
+        showReasoningMessageHistory={showReasoningMessageHistory}
+        setShowReasoningMessageHistory={setShowReasoningMessageHistory}
+        isCoding={isCoding}
+        isLoading={isLoading}
+        thinkingScrollRed={thinkingScrollRed}
+      />
 
-        <ChatMessages
-          messages={messages}
-          containerRef={containerRef}
-          isThinking={isThinking}
-          thinkingMessages={thinkingMessages}
-          showThinkingMessages={showThinkingMessages}
-          toggleThinkingMessages={toggleThinkingMessages}
-          showReasoningMessageHistory={showReasoningMessageHistory}
-          setShowReasoningMessageHistory={setShowReasoningMessageHistory}
-          isCoding={isCoding}
-          isLoading={isLoading}
-          thinkingScrollRed={thinkingScrollRed}
-          forceUpdate={forceUpdate}
-        />
-
-        <ChatInput
-          userMessage={userMessage}
-          setUserMessage={setUserMessage}
-          handleUserMessage={handleUserMessage}
-          forceStreamEND={forceStreamEND}
-        />
-      </div>
+      <ChatInput
+        userMessage={userMessage}
+        setUserMessage={setUserMessage}
+        handleUserMessage={handleUserMessage}
+        forceStreamEND={forceStreamEND}
+      />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useReducer } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { modelVariants } from "../components/ModelSelect";
 
 export default function useChatHandlers() {
@@ -12,11 +12,24 @@ export default function useChatHandlers() {
   const [isCoding, setIsCoding] = useState(false);
   const [showReasoningMessageHistory, setShowReasoningMessageHistory] = useState(false);
   const [selectedModel, setSelectedModel] = useState("ChatGPTapi~gpt-4o-mini");
-  const [chatId, setChatId] = useState(null);
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
-
+  const [selectedChatId, setSelectedChatId] = useState(null);
+  
   const containerRef = useRef(null);
   const thinkingScrollRed = useRef(null);
+
+  const loadChatById = useCallback(async (chatId) => {
+    try {
+      const chatData = await window.electron?.getChatData(chatId);
+      console.dir(chatData);
+      if (chatData) {
+        setMessages(chatData.messages || []);
+        setSelectedChatId(chatId);
+        localStorage.setItem("chatId", chatId);
+      }
+    } catch (error) {
+      console.error("Failed to load chat:", error);
+    }
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -25,38 +38,6 @@ export default function useChatHandlers() {
       }
     });
   }, []);
-
-  async function loadChatById(chatIdParam) {
-    try {
-      if (chatIdParam) {
-        const chat = await window.electron?.getChatData(chatIdParam);
-        console.dir(">>>>>>>>>>>>>>");
-        console.dir(chat);
-        console.dir(">>>>>>>>>>>>>>");
-        if (chat) {
-          setChatId(chatIdParam);
-          setMessages(chat.messages || []);
-          setThinkingMessages(chat.thinkingMessages || []);
-          setSelectedModel(chat.selectedModel || "ChatGPTapi~gpt-4o-mini");
-          forceUpdate();
-          return;
-        }
-      }
-  
-      // If no valid chatId or chat not found, create a new one
-      const chatObject = {
-        selectedModel,
-        messages: [],
-        thinkingMessages: [],
-      };
-  
-      const newChat = await window.electron?.createChat(chatObject);
-      setChatId(newChat.id);
-      localStorage.setItem("chatId", newChat.id);
-    } catch (error) {
-      console.error("Failed to load chat:", error);
-    }
-  }  
 
   const handleAIResponse = useCallback((event) => {
     setIsLoading(false);
@@ -171,19 +152,11 @@ export default function useChatHandlers() {
     }
   }, [messages]);
 
-  const handleUserMessage = useCallback(async (msg, fake = false) => {
+  const handleUserMessage = useCallback((msg, fake = false) => {
     setIsLoading(true);
     const newUserMessage = { message: msg, author: "user", role: "user" };
-    const otherOptions = {
-      selectedModel,
-      aiMessageIndex,
-      thinkingMessages
-    };
-
-    console.log("...............");
-    console.dir({chatId:chatId, newUserMessage:newUserMessage, messages:'messages', otherOptions:otherOptions});
-
-    setMessages(async (prev) => {
+    
+    setMessages((prev) => {
       const updatedMessages = [...prev, newUserMessage];
       const filteredMessages = updatedMessages.filter(
         (m) => m.author.toLowerCase() !== "informations"
@@ -199,15 +172,7 @@ export default function useChatHandlers() {
         })
       );
       if(!fake){
-        try {
-    
-          console.log("...............");
-          console.dir({chatId:chatId, newUserMessage:newUserMessage, messages:'messages', otherOptions:otherOptions});
-      
-          await window.electron?.addMessage(chatId, newUserMessage, "messages", otherOptions);
-        } catch (error) {
-          console.error("Failed to save message:", error);
-        }
+        window.electron?.addMessage(selectedChatId, newUserMessage);
         return updatedMessages;
       } else {
         return prev;
@@ -217,7 +182,9 @@ export default function useChatHandlers() {
     
     scrollToBottom();
     setUserMessage("");
-  }, [chatId, selectedModel, messages, scrollToBottom]);
+  }, [selectedModel, scrollToBottom]);
+
+  
 
   const forceStreamEND = useCallback(() => {
     document.dispatchEvent(new CustomEvent("abortAll"));
@@ -254,6 +221,10 @@ export default function useChatHandlers() {
   }, []);
 
   useEffect(() => {
+    console.dir(messages);
+  }, [messages]);
+
+  useEffect(() => {
     window.electron?.StreamEND(handleStreamEND);
     document.addEventListener("ResponseAI", handleAIResponse);
     document.addEventListener("executeFunction-response", handleExecuteFunctionResponse);
@@ -284,8 +255,7 @@ export default function useChatHandlers() {
     toggleThinkingMessages,
     setShowReasoningMessageHistory,
     scrollToBottom,
-    chatId,
     loadChatById,
-    forceUpdate
+    selectedChatId
   };
 }
