@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef, useCallback } from "react";
+
 export default function ChatMessages({
   messages,
   containerRef,
@@ -9,8 +11,14 @@ export default function ChatMessages({
   setShowReasoningMessageHistory,
   isCoding,
   isLoading,
-  thinkingScrollRed
+  thinkingScrollRed,
+  forceUpdate
 }) {
+
+  useEffect(() => {
+    console.dir(messages);
+  }, [messages, forceUpdate]);
+
   return (
     <div className="flex-grow overflow-y-auto p-4" ref={containerRef}>
       {messages.map((msg, index) => {

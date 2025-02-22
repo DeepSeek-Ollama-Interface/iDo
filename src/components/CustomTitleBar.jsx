@@ -38,7 +38,7 @@ function CustomTitlebar() {
   }, []);
 
   return (
-    <div className="w-full h-6 titleBarColor text-text flex items-center select-none px-2 py-4" style={{ WebkitAppRegion: "drag"}}>
+    <div className="w-full h-6 titleBarColor text-text flex items-center select-none px-2 py-4" style={{ WebkitAppRegion: "drag", height: "42px"}}>
 
       {/* <div className='flex flex-inline items-center justify-center'>
         <img src={faviconDark} alt="favicon" className="w-6 h-6"/>
@@ -83,6 +83,7 @@ function CustomTitlebar() {
           <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="white" className="group-hover:fill-gray-400"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
         </button>
       </div>
+      <br/>
     </div>
   );
 }

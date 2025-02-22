@@ -510,6 +510,69 @@ ipcMain.on('executeFunction', async (event, data) => {
   }
 });
 
+// IPC handlers for Chat History functions (getChat, addMessage, createChat, deleteChat)
+ipcMain.handle("getChat", async (event, chatId) => {
+  try {
+    const { getChat } = await import("../backend/export.mjs");
+    return await getChat(chatId);
+  } catch (error) {
+    console.error("Error in getChat:", error);
+    updateSetting({value: null, key:'chatId'})
+    throw error;
+  }
+});
+
+ipcMain.handle("addMessage", async (event, chatId, messageObject, chatType, otherOptions) => {
+  try {
+    console.log(`In ipcMain Handle im looking for ${chatId}`);
+    const { addMessage } = await import("../backend/export.mjs");
+    return await addMessage(chatId, messageObject, chatType, otherOptions);
+  } catch (error) {
+    console.error("Error in addMessage:", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("createChat", async (event, chatObject) => {
+  try {
+    const { createChat } = await import("../backend/export.mjs");
+    return await createChat(chatObject);
+  } catch (error) {
+    console.error("Error in createChat:", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("deleteChat", async (event, chatId) => {
+  try {
+    const { deleteChat } = await import("../backend/export.mjs");
+    return await deleteChat(chatId);
+  } catch (error) {
+    console.error("Error in deleteChat:", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("getAllChats", async (event) => {
+   try {
+     const { getAllChats } = await import("../backend/export.mjs");
+     return await getAllChats();
+   } catch (error) {
+     console.error("Error in getAllChats:", error);
+     throw error;
+   }
+ });
+
+ipcMain.handle("renameChat", async (event, chatId, newName) => {
+   try {
+     const { renameChat } = await import("../backend/export.mjs");
+     return await renameChat(chatId, newName);
+   } catch (error) {
+     console.error("Error in renameChat:", error);
+     throw error;
+   }
+});
+
 async function createStreamHandler(callback) {
   const backend = await import('../backend/export.mjs');
   return backend.createStreamHandler(callback);

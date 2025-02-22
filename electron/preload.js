@@ -20,6 +20,12 @@ contextBridge.exposeInMainWorld("electron", {
   readFile: (filePath) => ipcRenderer.invoke("read-file", filePath),
   writeFile: (filePath, content) => ipcRenderer.invoke("write-file", filePath, content),
   transcribeAudio: (audioData) => ipcRenderer.invoke("transcribe-audio", audioData),
+  getChatData: (chatId) => ipcRenderer.invoke("getChat", chatId),
+  addMessage: (chatId, messageObject, chatType, otherOptions) => ipcRenderer.invoke("addMessage", chatId, messageObject, chatType, otherOptions),
+  createChat: (chatObject) => ipcRenderer.invoke("createChat", chatObject),
+  deleteChat: (chatId) => ipcRenderer.invoke("deleteChat", chatId),
+  getAllChats: () => ipcRenderer.invoke("getAllChats"),
+  renameChat: (chatId, newName) => ipcRenderer.invoke("renameChat", chatId, newName),
 });
 
 ipcRenderer.on("ResponseAIIPC", (event, data) => {

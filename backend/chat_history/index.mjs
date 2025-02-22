@@ -1,81 +1,118 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import os from 'os';
 
 export class ChatHistory {
-  constructor(filePath = path.join(process.cwd(), 'chat-history.json')) {
-    this.filePath = filePath;
+  constructor(baseDir = path.join(os.homedir(), '.chat-history')) {
+    this.baseDir = baseDir;
+    this.chatFilePath = path.join(this.baseDir, 'chats.json'); // Single file for all chats
+    fs.ensureDirSync(this.baseDir);
+    this.#initializeChatFile();
   }
 
-  async #readHistory() {
+  async #initializeChatFile() {
     try {
-      const data = await fs.readFile(this.filePath, 'utf-8');
-      return JSON.parse(data);
-    } catch (error) {
-      if (error.code === 'ENOENT') {
-        return {};
+      if (!fs.existsSync(this.chatFilePath)) {
+        await fs.writeJson(this.chatFilePath, { chats: [] }, { spaces: 2 });
       }
-      throw new Error('Failed to read chat history');
+    } catch (error) {
+      throw new Error(`Failed to initialize chat file: ${error.message}`);
     }
   }
 
-  async #writeHistory(data) {
+  async #readChats() {
     try {
-      await fs.writeFile(this.filePath, JSON.stringify(data, null, 2), 'utf-8');
+      const data = await fs.readJson(this.chatFilePath);
+      return data.chats || [];
     } catch (error) {
-      throw new Error('Failed to write chat history');
+      throw new Error(`Failed to read chat history: ${error.message}`);
+    }
+  }
+
+  async #writeChats(chats) {
+    try {
+      await fs.writeJson(this.chatFilePath, { chats }, { spaces: 2 });
+    } catch (error) {
+      throw new Error(`Failed to write chat history: ${error.message}`);
     }
   }
 
   async getChat(chatId) {
-    const history = await this.#readHistory();
-    return history[chatId] || null;
+    const chats = await this.#readChats();
+    return chats.find(chat => chat.id === chatId) || null;
   }
 
-  async addMessage(chatId, message, sender, timestamp = new Date()) {
-    const history = await this.#readHistory();
-    
-    if (!history[chatId]) {
-      throw new Error('Chat does not exist');
+  async addMessage(chatId, messageObject, chatType, otherOptions = {}) {
+    let chats = await this.#readChats();
+    console.log(`IM LOKLING FOR ${chatId}`);
+    let chat = await this.getChat(chatId);
+
+    if (!chat) {
+      // If the chat doesn't exist, create a new one
+      const newChatId = uuidv4();
+      chat = {
+        id: newChatId,
+        created: new Date().toISOString(),
+        messages: [],
+        thinkingMessages: [],
+        ...otherOptions,
+        [chatType]: [messageObject],
+      };
+      chats.push(chat);
+      chatId = newChatId;
+    } else {
+      // Append the message to the appropriate array
+      if (chatType === 'messages') {
+        if (!Array.isArray(chat.messages)) chat.messages = [];
+        chat.messages.push(messageObject);
+      } else if (chatType === 'thinkingMessages') {
+        if (!Array.isArray(chat.thinkingMessages)) chat.thinkingMessages = [];
+        chat.thinkingMessages.push(messageObject);
+      } else {
+        throw new Error(`Unsupported chat type: ${chatType}`);
+      }
     }
 
-    history[chatId].messages.push({
-      message,
-      sender,
-      timestamp: timestamp.toISOString()
-    });
-
-    await this.#writeHistory(history);
-    return history[chatId];
+    await this.#writeChats(chats);
+    return chat;
   }
 
-  async createChat(initialMessages = []) {
-    const history = await this.#readHistory();
-    const chatId = uuidv4();
-    
-    history[chatId] = {
+  async createChat(chatObject = {}) {
+    const chats = await this.#readChats();
+    const chatId = uuidv4(); // Always generate a new unique ID
+    const newChat = {
       id: chatId,
       created: new Date().toISOString(),
-      messages: initialMessages.map(msg => ({
-        message: msg.message,
-        sender: msg.sender,
-        timestamp: msg.timestamp?.toISOString() || new Date().toISOString()
-      }))
+      messages: [],
+      thinkingMessages: [],
+      ...chatObject,
     };
 
-    await this.#writeHistory(history);
-    return history[chatId];
+    chats.push(newChat);
+    await this.#writeChats(chats);
+    return newChat;
   }
 
   async deleteChat(chatId) {
-    const history = await this.#readHistory();
-    
-    if (!history[chatId]) {
+    let chats = await this.#readChats();
+    chats = chats.filter(chat => chat.id !== chatId);
+    await this.#writeChats(chats);
+    return true;
+  }
+
+  async getAllChats() {
+    return await this.#readChats();
+  }
+
+  async renameChat(chatId, newName) {
+    const chats = await this.#readChats();
+    const chat = chats.find(chat => chat.id === chatId);
+    if (!chat) {
       throw new Error('Chat does not exist');
     }
-
-    delete history[chatId];
-    await this.#writeHistory(history);
-    return true;
+    chat.name = newName;
+    await this.#writeChats(chats);
+    return chat;
   }
 }
