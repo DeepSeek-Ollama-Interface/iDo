@@ -46,7 +46,7 @@ export default function ChatMessages({
 
         if(msg.author.toLowerCase() === "system"){
           try {
-            const parsedMessage = JSON.parse(msg.message); // Try to parse the JSON
+            const parsedMessage = (typeof msg.message === 'string') ? JSON.parse(msg.message) : msg.message; // Try to parse the JSON
             if (parsedMessage.exitCode !== undefined && !(typeof parsedMessage.exitCode === 'string')) {
               return (
                 <div key={index} className="flex flex-col items-start mt-2">
