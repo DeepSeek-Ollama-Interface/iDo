@@ -8,9 +8,9 @@ function UserSettings() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const paragraphs = [
-    "Quality Over Free – A Premium Experience for Everyone We believe in providing top-tier service without compromise, which is why we don’t offer free accounts. Every paid subscription directly supports our platform, ensuring unmatched quality, stability, and fairness for all users. At just a small cost—even as low as $1—you gain access to a premium experience where every feature is optimized for your benefit. We’re committed to delivering the best, and your support allows us to maintain a high-performance, ad-free environment that truly values its users.",
-    "Your Privacy, Protected by European Standards Your personal data is in safe hands—we strictly follow the European GDPR, the gold standard in data protection. No matter where you are in the world, our transparent and secure policies ensure that your information remains private and fully protected. We don’t just comply with GDPR; we embrace it because we believe privacy is a fundamental right. You can use our services with complete peace of mind, knowing your data is handled with the highest level of security.",
-    "Online-Powered Performance – No Limits, Just Seamless Features To bring you cutting-edge features without restrictions, our premium functions require an internet connection—not for payment verification, but to provide real-time, high-speed processing that works effortlessly on any device. Instead of limiting functionality, we’ve designed an intelligent, cloud-powered system that enhances performance, compatibility, and ease of use. This means you get a smooth, optimized experience wherever you go—without technical headaches."
+    "Quality Over Free – A Premium Experience for Everyone We believe in providing top-tier service without compromise, which is why we don’t offer free accounts. ",
+    "Your Privacy, Protected by European Standards Your personal data is in safe hands—we strictly follow the European GDPR, the gold standard in data protection. No matter where you are in the world",
+    "Online-Powered Performance – No Limits, Just Seamless Features To bring you cutting-edge features without restrictions, our premium functions require an internet connection—not for payment verification, but to provide real-time, high-speed processing that works effortlessly on any device."
   ];
 
   useEffect(() => {
@@ -29,17 +29,20 @@ function UserSettings() {
     console.log(`${isLoginForm ? 'Login' : 'Register'} with`, { username, password });
   };
 
+  const goToSlide = (index) => setCurrentIndex(index);
+
   return (
     <div className="w-full h-full flex flex-col justify-between p-4">
+      <div className="h-[100px]">
       <div className="flex flex-inline items-center justify-center gap-4 mb-4">
-        <button 
-          onClick={() => setIsLoginForm(true)} 
-          className={`btn w-24 p-2 rounded-lg transition-colors rounded-md ${isLoginForm ? 'btn-primary' : 'btn-primary/70'}`}>
+        <button
+          onClick={() => setIsLoginForm(true)}
+          className={`btn w-24 p-2 rounded-lg transition-colors ${isLoginForm ? 'btn-primary' : 'btn-primary/70'}`}>
           Login
         </button>
-        <button 
-          onClick={() => setIsLoginForm(false)} 
-          className={`btn w-24 p-2 rounded-lg transition-colors rounded-md ${!isLoginForm ? 'btn-primary' : 'btn-primary/70'}`}>
+        <button
+          onClick={() => setIsLoginForm(false)}
+          className={`btn w-24 p-2 rounded-lg transition-colors ${!isLoginForm ? 'btn-primary' : 'btn-primary/70'}`}>
           Register
         </button>
       </div>
@@ -75,9 +78,22 @@ function UserSettings() {
           {isLoginForm ? 'Login' : 'Register'}
         </button>
       </form>
+      </div>
 
-      <div className="h-auto w-full flex items-center justify-center text-left text-sm text-center">
+      <div className="relative w-full max-w-xl mx-auto bg-base-200 p-6 rounded-lg text-sm text-center">
         <p>{paragraphs[currentIndex]}</p>
+
+        <div className="flex justify-center mt-4">
+          {paragraphs.map((_, idx) => (
+            <span
+              key={idx}
+              className={`h-3 w-3 mx-1 rounded-full cursor-pointer ${
+                idx === currentIndex ? "bg-primary" : "bg-gray-400"
+              }`}
+              onClick={() => goToSlide(idx)}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
