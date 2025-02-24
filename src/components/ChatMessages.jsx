@@ -18,7 +18,7 @@ export default function ChatMessages({
   }, [messages]);
 
   return (
-    <div className="flex-grow overflow-y-auto p-4" ref={containerRef}>
+    <div className="h-full overflow-y-auto p-4" ref={containerRef}>
       {messages.map((msg, index) => {
         const formattedAuthor = msg.author.charAt(0).toUpperCase() + msg.author.slice(1);
 

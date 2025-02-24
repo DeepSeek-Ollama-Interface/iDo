@@ -1,7 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { modelVariants } from "../components/ModelSelect";
+import { createContext, useContext, useState, useRef, useEffect, useCallback } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
-export default function useChatHandlers() {
+const ChatHandlersContext = createContext();
+
+export function ChatHandlersProvider({ children }) {
+  // State and refs
   const [userMessage, setUserMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [thinkingMessages, setThinkingMessages] = useState([]);
@@ -13,14 +16,23 @@ export default function useChatHandlers() {
   const [showReasoningMessageHistory, setShowReasoningMessageHistory] = useState(false);
   const [selectedModel, setSelectedModel] = useState("ChatGPTapi~gpt-4o-mini");
   const [selectedChatId, setSelectedChatId] = useState(null);
-  
+
   const containerRef = useRef(null);
   const thinkingScrollRed = useRef(null);
 
+  // Scroll to bottom of chat
+  const scrollToBottom = useCallback(() => {
+    requestAnimationFrame(() => {
+      if (containerRef.current) {
+        containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      }
+    });
+  }, []);
+
+  // Load chat by ID
   const loadChatById = useCallback(async (chatId) => {
     try {
       const chatData = await window.electron?.getChatData(chatId);
-      console.dir(chatData);
       if (chatData) {
         setMessages(chatData.messages || []);
         setSelectedChatId(chatId);
@@ -29,14 +41,6 @@ export default function useChatHandlers() {
     } catch (error) {
       console.error("Failed to load chat:", error);
     }
-  }, []);
-
-  const scrollToBottom = useCallback(() => {
-    requestAnimationFrame(() => {
-      if (containerRef.current) {
-        containerRef.current.scrollTop = containerRef.current.scrollHeight;
-      }
-    });
   }, []);
 
   const handleAIResponse = useCallback((event) => {
@@ -136,22 +140,6 @@ export default function useChatHandlers() {
     scrollToBottom();
   }, [scrollToBottom]);
 
-  const handleStreamEND = useCallback(() => {
-    setIsCoding(false);
-    setIsThinking(false);
-    setAiMessageIndex(null);
-    setIsLoading(false);
-
-    const getLastAIMessageIndex = [...messages].reverse().find(msg => msg.author.toLowerCase() === "ai");
-    if (getLastAIMessageIndex?.message) {
-      const command = getLastAIMessageIndex.message.match(/<func>(.*?)<\/func>/s);
-      if (command?.[1]) {
-        const event = new CustomEvent("executeFunction", { detail: command[1] });
-        document.dispatchEvent(event);
-      }
-    }
-  }, [messages]);
-
   const handleUserMessage = useCallback((msg, fake = false) => {
     setIsLoading(true);
     const newUserMessage = { message: msg, author: "user", role: "user" };
@@ -172,7 +160,11 @@ export default function useChatHandlers() {
         })
       );
       if(!fake){
-        window.electron?.addMessage(selectedChatId, newUserMessage);
+        if (!selectedChatId) {
+            const tempselectedChatId = uuidv4(); // Generates a new unique ID
+            setSelectedChatId(tempselectedChatId);
+        }
+        window.electron?.addMessage(selectedChatId, newUserMessage, 'messages', { thinkingMessages, selectedModel, aiMessageIndex });
         return updatedMessages;
       } else {
         return prev;
@@ -184,7 +176,23 @@ export default function useChatHandlers() {
     setUserMessage("");
   }, [selectedModel, scrollToBottom]);
 
-  
+  const handleStreamEND = useCallback(() => {
+    setIsCoding(false);
+    setIsThinking(false);
+    setAiMessageIndex(null);
+    setIsLoading(false);
+
+    const getLastAIMessageIndex = [...messages].reverse().find(msg => msg.author.toLowerCase() === "ai");
+    if (getLastAIMessageIndex?.message) {
+      const command = getLastAIMessageIndex.message.match(/<func>(.*?)<\/func>/s);
+      if (command?.[1]) {
+        const event = new CustomEvent("executeFunction", { detail: command[1] });
+        document.dispatchEvent(event);
+      }
+    }
+
+    window.electron?.addMessage(selectedChatId, messages[messages.length - 1], 'messages', { thinkingMessages, selectedModel, aiMessageIndex }); 
+  }, [messages]);
 
   const forceStreamEND = useCallback(() => {
     document.dispatchEvent(new CustomEvent("abortAll"));
@@ -192,27 +200,7 @@ export default function useChatHandlers() {
   }, [handleFakeUserMessage]);
 
   const toggleThinkingMessages = useCallback(() => {
-    setShowThinkingMessages(prev => !prev);
-  }, []);
-
-  const handleExecuteFunctionResponse = useCallback((event) => {
-    console.dir(event);
-
-    const systemMessage = {
-      message: event.detail,
-      author: "system",
-      role: "system",
-    };
-
-    console.dir(systemMessage);
-
-    setMessages((prev) => {
-      const updatedMessages = [...prev, systemMessage];
-      return updatedMessages;
-    });
-
-    handleUserMessage('', true);
-
+    setShowThinkingMessages((prev) => !prev);
   }, []);
 
   useEffect(() => {
@@ -220,42 +208,54 @@ export default function useChatHandlers() {
     setSelectedModel(savedModel);
   }, []);
 
-  useEffect(() => {
-    console.dir(messages);
-  }, [messages]);
+  const handleChatIdChange = useCallback((event) => {
+    const id = event.detail;
+    setSelectedChatId(id);
+  });
 
   useEffect(() => {
     window.electron?.StreamEND(handleStreamEND);
     document.addEventListener("ResponseAI", handleAIResponse);
-    document.addEventListener("executeFunction-response", handleExecuteFunctionResponse);
-
+    document.addEventListener("chatIdChange", handleChatIdChange);
     return () => {
       document.removeEventListener("ResponseAI", handleAIResponse);
-      document.removeEventListener("executeFunction-response", handleExecuteFunctionResponse);
+      document.removeEventListener("chatIdChange", handleChatIdChange);
       window.electron?.removeStreamENDListeners?.();
     };
-  }, [handleAIResponse, handleStreamEND, handleExecuteFunctionResponse]);
+  }, [handleAIResponse, handleStreamEND]);
 
-  return {
-    userMessage,
-    setUserMessage,
-    messages,
-    thinkingMessages,
-    isLoading,
-    isThinking,
-    showThinkingMessages,
-    isCoding,
-    showReasoningMessageHistory,
-    selectedModel,
-    setSelectedModel,
-    containerRef,
-    thinkingScrollRed,
-    handleUserMessage,
-    forceStreamEND,
-    toggleThinkingMessages,
-    setShowReasoningMessageHistory,
-    scrollToBottom,
-    loadChatById,
-    selectedChatId
-  };
+  return (
+    <ChatHandlersContext.Provider
+      value={{
+        userMessage,
+        setUserMessage,
+        messages,
+        setMessages,
+        thinkingMessages,
+        setThinkingMessages,
+        aiMessageIndex,
+        isLoading,
+        isThinking,
+        showThinkingMessages,
+        isCoding,
+        showReasoningMessageHistory,
+        selectedModel,
+        setSelectedModel,
+        selectedChatId,
+        loadChatById,
+        containerRef,
+        thinkingScrollRed,
+        handleUserMessage,
+        forceStreamEND,
+        toggleThinkingMessages,
+        scrollToBottom,
+      }}
+    >
+      {children}
+    </ChatHandlersContext.Provider>
+  );
+}
+
+export function useChatHandlers() {
+  return useContext(ChatHandlersContext);
 }
