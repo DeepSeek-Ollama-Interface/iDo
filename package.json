@@ -2,7 +2,7 @@
   "name": "deepseek-ollama-interface",
   "private": true,
   "version": "1.0.3",
-  "author": "OxiJenuuu / B1TV-670",
+  "author": "https://ido.vin",
   "main": "./electron/main.cjs",
   "type": "module",
   "repository": {
