@@ -6,6 +6,7 @@ import "./index.css";
 import CustomTitlebar from "./components/CustomTitleBar.jsx";
 import CustomTitlebarSettings from "./components/CustomTitleBarSettings.jsx";
 import { ChatHandlersProvider } from "./ChatHandlersProvider.jsx";
+import RecaptchaProvider from "./components/recaptchaProvider";
 
 function Root() {
   const location = useLocation();
@@ -13,10 +14,12 @@ function Root() {
 
   return (
     <ChatHandlersProvider>
-      <div className="h-screen w-full flex flex-col" style={{ overflow: "hidden" }}>
-        {isSettingsPage ? <CustomTitlebarSettings /> : <CustomTitlebar />}
-        <App />
-      </div>
+      <RecaptchaProvider siteKey="6LdxA-IqAAAAAL-zX5WXpfZEgiBEkNRjUGMH24Ar">
+        <div className="h-screen w-full flex flex-col" style={{ overflow: "hidden" }}>
+          {isSettingsPage ? <CustomTitlebarSettings /> : <CustomTitlebar />}
+          <App />
+        </div>
+      </RecaptchaProvider>
     </ChatHandlersProvider>
   );
 }
