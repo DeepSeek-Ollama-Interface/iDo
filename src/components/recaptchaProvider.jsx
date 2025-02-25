@@ -16,7 +16,7 @@ const RecaptchaProvider = ({ children }) => {
 
     if (!window.grecaptcha) {
       const script = document.createElement("script");
-      script.src = `https://www.google.com/recaptcha/api.js?render=6LdQH-IqAAAAAFyT66Y3TjYwOtaETGNc4jgi5ulO`;
+      script.src = `https://www.google.com/recaptcha/api.js?render=6Lc1uOIqAAAAAPh85Piq3M-huFU5ZeOhUsEs3nJq`;
       script.async = true;
       script.defer = true;
       script.onload = loadRecaptcha;
@@ -32,7 +32,7 @@ const RecaptchaProvider = ({ children }) => {
     return new Promise((resolve, reject) => {
       window.grecaptcha.ready(() => {
         window.grecaptcha
-          .execute("6LdQH-IqAAAAAFyT66Y3TjYwOtaETGNc4jgi5ulO", { action: "submit" })
+          .execute("6Lc1uOIqAAAAAPh85Piq3M-huFU5ZeOhUsEs3nJq", { action: "submit" })
           .then(resolve)
           .catch(reject);
       });

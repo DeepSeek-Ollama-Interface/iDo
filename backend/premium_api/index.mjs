@@ -7,6 +7,7 @@ export default class WebSocketClient {
     this.isConnected = false;
     this.isLoggedIn = false;
     this.messageQueue = [];
+    this.aiMessageQueue = []; // Separate queue for AI responses
   }
 
   connect() {
@@ -22,12 +23,15 @@ export default class WebSocketClient {
       });
 
       this.ws.on('message', (data) => {
-        console.dir(data);
         try {
           const message = JSON.parse(data);
+
           if (this.messageQueue.length > 0) {
             const nextResolver = this.messageQueue.shift();
             nextResolver(message);
+          } else if (message.event === 'AskAIResponse') {
+            // Handle AI messages separately
+            this.aiMessageQueue.push(message);
           } else {
             console.warn('Received unsolicited message:', message);
           }
@@ -87,18 +91,21 @@ export default class WebSocketClient {
   }
 
   async *askAI(question) {
-    console.log(`Asked AI in index.mjs: ${question}`);
-    if (!this.isConnected) throw new Error('Not connected to Premium API WebSocket');
-    if (!this.isLoggedIn) throw new Error('Not logged in to Premium API');
+    console.log(`Asked AI: ${question}`);
+    if (!this.isConnected) throw new Error('Not connected to WebSocket');
+    if (!this.isLoggedIn) throw new Error('Not logged in');
 
     this.sendMessage({ event: 'AskAI', payload: { question } });
 
     while (true) {
-      const message = await new Promise((resolve) => this.messageQueue.push(resolve));
+      if (this.aiMessageQueue.length > 0) {
+        const message = this.aiMessageQueue.shift();
+        yield message;
 
-      yield message;
-
-      if (message.done || message.error) break;
+        if (message.done || message.error) break;
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 50)); // Small delay to avoid blocking
+      }
     }
   }
 

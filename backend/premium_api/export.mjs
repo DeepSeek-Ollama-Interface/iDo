@@ -1,7 +1,7 @@
 import ms from 'ms';
 import WebSocketClient from './index.mjs';
 
-const client = new WebSocketClient('ws://localhost:3001');
+const client = new WebSocketClient('ws://api.ido.vin:3001');
 let started = false;
 
 export const connect = async () => {
@@ -36,43 +36,50 @@ start();
  * askAI is an async generator that yields messages from the Premium API.
  */
 export async function* askAI(question) {
-  await start();
-
-  console.log('Yielding chunks in askAI backend premium API');
-
-  for await (let msg of client.askAI(question)) {
-    console.log('Yielded chunk in premium API:', msg);
+    console.log("🟢 Entered askAIpremium function");
+  
     try {
-        if((typeof msg).toLocaleLowerCase() === 'string'){
-            const tryParse = JSON.parse(msg);
-            if(tryParse.status && tryParse.status.toLocaleLowerCase() === 'error'){
-                const tempObj = {
-                    ...tryParse,
-                    error: true,
-                    done: true
-                }
-                msg = JSON.stringify(tempObj);
-            }
-        } else if((typeof msg).toLocaleLowerCase() === 'object'){
-            if(msg.status && msg.status.toLocaleLowerCase() === 'error'){
-                const tempObj = {
-                    ...msg,
-                    error: true,
-                    done: true
-                }
-                msg = tempObj;
-            }
+      await start();
+      console.log("📨 Asking WebSocket AI:", question);
+  
+      const responseStream = client.askAI(question);
+  
+      console.log("🕵️‍♂️ Debug - Got ResponseStream:", responseStream);
+  
+      for await (let msg of responseStream) {
+        console.log("📥 WebSocket Raw Response:", msg);
+  
+        let formattedMsg = { message: { content: '' }, done: false };
+  
+        try {
+          if (typeof msg === 'string') {
+            msg = JSON.parse(msg);
+          }
+  
+          formattedMsg = {
+            message: { content: msg.data.message.content || ' ' },
+            done: msg.data.done || false
+          };
+  
+        } catch (error) {
+          console.error("❌ Error parsing WebSocket message:", error);
+          formattedMsg = { message: { content: "Error processing message" }, done: true };
         }
-    } catch(e){
-        //Do nothing, we tried
+  
+        console.log("✅ Yielding formatted message:", formattedMsg);
+        yield formattedMsg;
+  
+        if (formattedMsg.done) {
+          console.log("🛑 Stream finished.");
+          started = false;
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("❌ askAIpremium encountered an error:", error);
+      yield { message: { content: error.message || "Unknown error" }, done: true };
     }
-    yield msg;
-    if (msg.done || msg.error) {
-        started = false;
-        break;
-    }
-  }
-}
+  }  
 
 export const closeConnection = () => {
   client.close();

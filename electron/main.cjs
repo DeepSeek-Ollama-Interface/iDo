@@ -260,7 +260,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      // webSecurity: false,
+      webSecurity: false,
       // allowRunningInsecureContent: true,
       // enableRemoteModule: true,
       // enableBlinkFeatures: "SpeechRecognition",

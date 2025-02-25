@@ -55,7 +55,13 @@ export function ChatHandlersProvider({ children }) {
         if (response.stream && response.chunk) {
           lastMessage.message += response.chunk;
         } else if (response[0]?.message) {
-          lastMessage.message += response[0].message;
+          try {
+            lastMessage.message += response[0].message;
+          } catch(e){
+            console.dir(lastMessage);
+            lastMessage = {"role": "ai", "author": "ai", "message": ""};
+            lastMessage.message += '';
+          }
         }
         
         thinkingScrollRed.current?.scrollIntoView({ behavior: "smooth" });
@@ -68,12 +74,22 @@ export function ChatHandlersProvider({ children }) {
         const newMessages = [...prev];
         
         if (aiMessageIndex !== null && newMessages[aiMessageIndex]) {
-          const lastMessage = newMessages[aiMessageIndex];
+          let lastMessage = newMessages[aiMessageIndex];
+
+          if(!lastMessage){
+            lastMessage = newMessages[messages.length - 1];
+          }
           
           if (response.stream && response.chunk) {
             lastMessage.message += response.chunk;
           } else if (response[0]?.message) {
-            lastMessage.message += response[0].message;
+            try {
+                lastMessage.message += response[0].message;
+            } catch(e){
+                console.dir(lastMessage);
+                lastMessage = {"role": "ai", "author": "ai", "message": ""};
+                lastMessage.message += '';
+            }
           }
         } else if (response[0]?.message) {
           newMessages.push({
@@ -249,6 +265,7 @@ export function ChatHandlersProvider({ children }) {
         forceStreamEND,
         toggleThinkingMessages,
         scrollToBottom,
+        setShowReasoningMessageHistory
       }}
     >
       {children}

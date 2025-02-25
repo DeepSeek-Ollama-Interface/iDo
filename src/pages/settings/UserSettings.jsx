@@ -45,7 +45,7 @@ function UserSettingsContent() {
         ? { email, password, recaptcha: token }
         : { username, email, password, recaptcha: token };
 
-      const endpoint = isLoginForm ? "http://api.ido.vin:3001/login" : "http://api.ido.vin:3001/register";
+      const endpoint = isLoginForm ? "http://localhost:3001/login" : "http://localhost:3001/register";
       const response = await axios.post(endpoint, payload);
 
       setSuccess(true);
@@ -89,7 +89,7 @@ function UserSettingsContent() {
             />
           )}
           <input
-            type="email"
+            type="test"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}

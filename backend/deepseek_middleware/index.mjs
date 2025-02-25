@@ -146,7 +146,7 @@ export class DeepSeekCore {
     } else if (modelName.toLowerCase().startsWith("premiumapi")) {
       console.log("✅ Using Premium API...");
       const responseStream = askAIpremium(payload.messages);
-
+      console.dir(responseStream);
       return payload.stream ? this.#handleStream(responseStream) : responseStream;
     }
 
