@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import ReCAPTCHA from "react-google-recaptcha";
+import { useState, useEffect, useCallback } from "react";
+import { GoogleReCaptchaProvider, useGoogleReCaptcha } from "@google-recaptcha/react";
 import axios from "axios";
 
 function UserSettings() {
@@ -10,9 +10,11 @@ function UserSettings() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [recaptchaToken, setRecaptchaToken] = useState("");
 
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
   const paragraphs = [
-    "Quality Over Free – A Premium Experience for Everyone We believe in providing top-tier service without compromise, which is why we don’t offer free accounts. ",
-    "Your Privacy, Protected by European Standards Your personal data is in safe hands—we strictly follow the European GDPR, the gold standard in data protection. No matter where you are in the world",
+    "Quality Over Free – A Premium Experience for Everyone We believe in providing top-tier service without compromise, which is why we don’t offer free accounts.",
+    "Your Privacy, Protected by European Standards Your personal data is in safe hands—we strictly follow the European GDPR, the gold standard in data protection. No matter where you are in the world.",
     "Online-Powered Performance – No Limits, Just Seamless Features To bring you cutting-edge features without restrictions, our premium functions require an internet connection—not for payment verification, but to provide real-time, high-speed processing that works effortlessly on any device."
   ];
 
@@ -23,6 +25,15 @@ function UserSettings() {
     return () => clearInterval(intervalId);
   }, []);
 
+  const handleReCaptchaVerify = useCallback(async () => {
+    if (!executeRecaptcha) {
+      console.log("Execute recaptcha not available");
+      return;
+    }
+    const token = await executeRecaptcha("login_or_register");
+    setRecaptchaToken(token);
+  }, [executeRecaptcha]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isLoginForm && password !== confirmPassword) {
@@ -30,7 +41,7 @@ function UserSettings() {
       return;
     }
 
-    // reCAPTCHA verification
+    // Ensure reCAPTCHA verification
     if (!recaptchaToken) {
       alert("Please verify reCAPTCHA.");
       return;
@@ -48,10 +59,6 @@ function UserSettings() {
   };
 
   const goToSlide = (index) => setCurrentIndex(index);
-
-  const handleRecaptcha = (token) => {
-    setRecaptchaToken(token);
-  };
 
   return (
     <div className="w-full h-full flex flex-col justify-between p-4">
@@ -100,13 +107,12 @@ function UserSettings() {
             {isLoginForm ? 'Login' : 'Register'}
           </button>
         </form>
-      </div>
 
-      {/* Google reCAPTCHA */}
-      <ReCAPTCHA
-        sitekey="6LdxA-IqAAAAAL-zX5WXpfZEgiBEkNRjUGMH24Ar"
-        onChange={handleRecaptcha}
-      />
+        {/* reCAPTCHA Trigger Button */}
+        <button onClick={handleReCaptchaVerify} className="w-64 p-2 btn btn-secondary rounded-md mt-4">
+          Verify reCAPTCHA
+        </button>
+      </div>
 
       <div className="relative w-full max-w-xl mx-auto bg-base-200 p-6 rounded-lg text-sm text-center">
         <p>{paragraphs[currentIndex]}</p>
@@ -127,4 +133,10 @@ function UserSettings() {
   );
 }
 
-export default UserSettings;
+export default function App() {
+  return (
+    <GoogleReCaptchaProvider reCaptchaKey="6LdxA-IqAAAAAL-zX5WXpfZEgiBEkNRjUGMH24Ar">
+      <UserSettings />
+    </GoogleReCaptchaProvider>
+  );
+}
