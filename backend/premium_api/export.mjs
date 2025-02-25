@@ -1,13 +1,12 @@
 import ms from 'ms';
 import WebSocketClient from './index.mjs';
 
-const client = new WebSocketClient('ws://api.ido.vin:3001');
+const client = new WebSocketClient('ws://localhost:3001');
 let started = false;
 
 export const connect = async () => {
   if (!started) {
     await client.connect();
-    started = true;
   }
 };
 
@@ -18,10 +17,16 @@ export const login = async (username) => {
 
 async function start() {
   if (!started) {
-    await connect();
-    const loginResult = await client.login('user123');
-    console.log('WebSockets started');
-    console.dir(loginResult);
+    try {
+        await connect();
+        const loginResult = await client.login('user123');
+        console.log('WebSockets started');
+        console.dir(loginResult);
+        started = true;
+    } catch(e){
+        console.log(e);
+        started = false;
+    }
   }
 }
 

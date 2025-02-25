@@ -22,6 +22,7 @@ export default class WebSocketClient {
       });
 
       this.ws.on('message', (data) => {
+        console.dir(data);
         try {
           const message = JSON.parse(data);
           if (this.messageQueue.length > 0) {
@@ -69,9 +70,9 @@ export default class WebSocketClient {
     this.ws.send(JSON.stringify(message));
   }
 
-  async login(username) {
+  async login(token) {
     if (!this.isConnected) throw new Error('WebSocket is not connected');
-    this.sendMessage({ event: 'login', username });
+    this.sendMessage({ event: 'login', token: token });
 
     return new Promise((resolve, reject) => {
       this.messageQueue.push((msg) => {
