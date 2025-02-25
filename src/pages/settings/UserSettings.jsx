@@ -1,142 +1,38 @@
-import { useState, useEffect, useCallback } from "react";
-import { GoogleReCaptchaProvider, useGoogleReCaptcha } from "@google-recaptcha/react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
+import { RecaptchaContext } from "../../components/recaptchaProvider";
 
-function UserSettings() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoginForm, setIsLoginForm] = useState(true);
-  const [username, setUsername] = useState("");
+const UserSettings = () => {
+  const { executeRecaptcha } = useContext(RecaptchaContext);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [recaptchaToken, setRecaptchaToken] = useState("");
-
-  const { executeRecaptcha } = useGoogleReCaptcha();
-
-  const paragraphs = [
-    "Quality Over Free – A Premium Experience for Everyone We believe in providing top-tier service without compromise, which is why we don’t offer free accounts.",
-    "Your Privacy, Protected by European Standards Your personal data is in safe hands—we strictly follow the European GDPR, the gold standard in data protection. No matter where you are in the world.",
-    "Online-Powered Performance – No Limits, Just Seamless Features To bring you cutting-edge features without restrictions, our premium functions require an internet connection—not for payment verification, but to provide real-time, high-speed processing that works effortlessly on any device."
-  ];
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % paragraphs.length);
-    }, 5000);
-    return () => clearInterval(intervalId);
-  }, []);
-
-  const handleReCaptchaVerify = useCallback(async () => {
-    if (!executeRecaptcha) {
-      console.log("Execute recaptcha not available");
-      return;
-    }
-    const token = await executeRecaptcha("login_or_register");
-    setRecaptchaToken(token);
-  }, [executeRecaptcha]);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isLoginForm && password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
-
-    // Ensure reCAPTCHA verification
-    if (!recaptchaToken) {
-      alert("Please verify reCAPTCHA.");
-      return;
-    }
-
-    const userData = { username, password, recaptchaToken };
 
     try {
-      const endpoint = isLoginForm ? "/login" : "/register";
-      const response = await axios.post(`http://your-api-url${endpoint}`, userData);
-      console.log("API Response:", response.data);
+      const token = await executeRecaptcha(); // Get reCAPTCHA token
+      if (!token) throw new Error("Failed to generate reCAPTCHA token");
+
+      const response = await axios.post("/api/auth/login", { email, password, recaptcha: token });
+      console.log("Login successful:", response.data);
     } catch (err) {
-      console.error("API Error:", err.response?.data || err.message);
+      setError(err.message || "Something went wrong");
     }
   };
 
-  const goToSlide = (index) => setCurrentIndex(index);
-
   return (
-    <div className="w-full h-full flex flex-col justify-between p-4">
-      <div className="h-[100px]">
-        <div className="flex flex-inline items-center justify-center gap-4 mb-4">
-          <button
-            onClick={() => setIsLoginForm(true)}
-            className={`btn w-24 p-2 rounded-lg transition-colors ${isLoginForm ? 'btn-primary' : 'btn-primary/70'}`}>
-            Login
-          </button>
-          <button
-            onClick={() => setIsLoginForm(false)}
-            className={`btn w-24 p-2 rounded-lg transition-colors ${!isLoginForm ? 'btn-primary' : 'btn-primary/70'}`}>
-            Register
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4 mb-4">
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="p-2 w-64 rounded-lg bg-[#383A40] border-none focus:ring-0 focus:outline-none shadow-none"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="p-2 w-64 rounded-lg bg-[#383A40] border-none focus:ring-0 focus:outline-none shadow-none"
-            required
-          />
-          {!isLoginForm && (
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="p-2 w-64 rounded-lg bg-[#383A40] border-none focus:ring-0 focus:outline-none shadow-none"
-              required
-            />
-          )}
-          <button type="submit" className="w-64 p-2 btn btn-primary rounded-md hover:btn-primary/70 transition-colors">
-            {isLoginForm ? 'Login' : 'Register'}
-          </button>
-        </form>
-
-        {/* reCAPTCHA Trigger Button */}
-        <button onClick={handleReCaptchaVerify} className="w-64 p-2 btn btn-secondary rounded-md mt-4">
-          Verify reCAPTCHA
-        </button>
-      </div>
-
-      <div className="relative w-full max-w-xl mx-auto bg-base-200 p-6 rounded-lg text-sm text-center">
-        <p>{paragraphs[currentIndex]}</p>
-
-        <div className="flex justify-center mt-4">
-          {paragraphs.map((_, idx) => (
-            <span
-              key={idx}
-              className={`h-3 w-3 mx-1 rounded-full cursor-pointer ${
-                idx === currentIndex ? "bg-primary" : "bg-gray-400"
-              }`}
-              onClick={() => goToSlide(idx)}
-            />
-          ))}
-        </div>
-      </div>
+    <div>
+      <h2>Login</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
     </div>
   );
-}
+};
 
-export default function App() {
-  return (
-    <GoogleReCaptchaProvider reCaptchaKey="6LdxA-IqAAAAAL-zX5WXpfZEgiBEkNRjUGMH24Ar">
-      <UserSettings />
-    </GoogleReCaptchaProvider>
-  );
-}
+export default UserSettings;
