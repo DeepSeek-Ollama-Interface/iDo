@@ -1,4 +1,5 @@
 export const modelVariants = [
+    "PremiumAPI",
     "deepseek-r1:1.5b",
     "deepseek-r1:7b",
     "deepseek-r1:8b",

@@ -5,6 +5,7 @@ import os, { type } from 'os';
 import { getPrompt, analyzeResponse} from '../inject_promt/export.mjs';
 import { getSetting } from '../local_settings/export.mjs';
 import { askAI, abortAll as abortAllGPT } from '../chatgpt_api/export.mjs';
+import { askAI as askAIpremium, connect, login } from '../premium_api/export.mjs';
 
 export class DeepSeekCore {
   constructor() {
@@ -96,7 +97,7 @@ export class DeepSeekCore {
   }
 
   async sendChatMessage(payload) {
-    console.log("🔍 sendChatMessage received payload:", payload);
+    console.log("🟢 sendChatMessage received payload:", payload);
 
     const modelName = payload.modelname;
     const sysPromt = this.#loadSystemPrompt();
@@ -105,14 +106,14 @@ export class DeepSeekCore {
 
     try {
       inject = getSetting('injectPrompt');
-      console.log("✅ injectPrompt setting:", inject);
+      console.log("🟢 injectPrompt setting:", inject);
     } catch (err) {
       console.error("❌ ERROR: getSetting('injectPrompt') failed!", err);
     }
 
     let loadSysPromt = false;
 
-    console.log("✅ Checkpoint 1: sysPromt loaded:", sysPromt);
+    console.log("🟢 Checkpoint 1: sysPromt loaded:", sysPromt);
 
     if (inject) {
       try {
@@ -142,20 +143,25 @@ export class DeepSeekCore {
       const model = modelName.split("~")[1];
       const response = await askAI(payload.messages, payload.stream, model);
       return payload.stream ? this.#handleStream(response) : response;
+    } else if (modelName.toLowerCase().startsWith("premiumapi")) {
+      console.log("✅ Using Premium API...");
+      const responseStream = askAIpremium(payload.messages);
+
+      return payload.stream ? this.#handleStream(responseStream) : responseStream;
     }
 
-    console.log("✅ Checkpoint 3: Checking if system prompt should be loaded...");
+    console.log("🟢 Checkpoint 3: Checking if system prompt should be loaded...");
 
     if (sysPromt && typeof sysPromt === 'string' && sysPromt.trim() !== '') {
       loadSysPromt = true;
-      console.log("✅ Checkpoint 4: System prompt detected, creating custom model...");
+      console.log("🟢 Checkpoint 4: System prompt detected, creating custom model...");
       await this.#createModelIfNotExists(modelName, true);
     } else {
-      console.log("✅ Checkpoint 4: No system prompt, loading model normally...");
+      console.log("🟢 Checkpoint 4: No system prompt, loading model normally...");
       await this.#createModelIfNotExists(modelName, false);
     }
 
-    console.log("🚀 Starting chat completion with:", {
+    console.log("🟢 Starting chat completion with:", {
       model: loadSysPromt ? `${modelName}-kepler` : `${modelName}`,
       messages: payload.messages,
       stream: payload.stream
