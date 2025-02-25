@@ -47,7 +47,7 @@ async function runOllamaProcess() {
 }
 
 // const isDev = process.env.NODE_ENV === 'development';
-const isDev = false;
+const isDev = true;
 
 let mainWindow;
 let settingsWindow = null;
@@ -310,6 +310,7 @@ function toggleSettingsWindow() {
 }
 
 app.disableHardwareAcceleration();
+
 
 app.whenReady().then(() => {
   createWindow();

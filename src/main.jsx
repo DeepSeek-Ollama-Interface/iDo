@@ -14,7 +14,7 @@ function Root() {
 
   return (
     <ChatHandlersProvider>
-      <RecaptchaProvider siteKey="6LdxA-IqAAAAAL-zX5WXpfZEgiBEkNRjUGMH24Ar">
+      <RecaptchaProvider>
         <div className="h-screen w-full flex flex-col" style={{ overflow: "hidden" }}>
           {isSettingsPage ? <CustomTitlebarSettings /> : <CustomTitlebar />}
           <App />

@@ -1,47 +1,49 @@
-import React, { createContext, useEffect, useState, useCallback } from "react";
-import PropTypes from "prop-types";
+import React, { createContext, useEffect, useState } from "react";
 
-export const RecaptchaContext = createContext(null);
+export const RecaptchaContext = createContext();
 
-const RecaptchaProvider = ({ children, siteKey }) => {
-  const [token, setToken] = useState(null);
+const RecaptchaProvider = ({ children }) => {
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
 
-  // Load reCAPTCHA script dynamically
   useEffect(() => {
-    const existingScript = document.querySelector('script[src="https://www.google.com/recaptcha/api.js"]');
-    if (!existingScript) {
+    const loadRecaptcha = () => {
+      if (window.grecaptcha) {
+        setRecaptchaReady(true);
+      } else {
+        console.error("reCAPTCHA failed to load");
+      }
+    };
+
+    if (!window.grecaptcha) {
       const script = document.createElement("script");
-      script.src = "https://www.google.com/recaptcha/api.js";
+      script.src = `https://www.google.com/recaptcha/api.js?render=6LdQH-IqAAAAAFyT66Y3TjYwOtaETGNc4jgi5ulO`;
       script.async = true;
       script.defer = true;
+      script.onload = loadRecaptcha;
       document.body.appendChild(script);
+    } else {
+      loadRecaptcha();
     }
   }, []);
 
-  // Function to execute reCAPTCHA and get token
-  const executeRecaptcha = useCallback(() => {
-    return new Promise((resolve, reject) => {
-      if (!window.grecaptcha) {
-        reject("reCAPTCHA not loaded");
-        return;
-      }
+  const executeRecaptcha = async () => {
+    if (!recaptchaReady) throw new Error("reCAPTCHA is not ready");
 
+    return new Promise((resolve, reject) => {
       window.grecaptcha.ready(() => {
-        window.grecaptcha.execute(siteKey, { action: "submit" }).then(resolve).catch(reject);
+        window.grecaptcha
+          .execute("6LdQH-IqAAAAAFyT66Y3TjYwOtaETGNc4jgi5ulO", { action: "submit" })
+          .then(resolve)
+          .catch(reject);
       });
     });
-  }, [siteKey]);
+  };
 
   return (
-    <RecaptchaContext.Provider value={{ token, setToken, executeRecaptcha }}>
+    <RecaptchaContext.Provider value={{ executeRecaptcha }}>
       {children}
     </RecaptchaContext.Provider>
   );
-};
-
-RecaptchaProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  siteKey: PropTypes.string.isRequired,
 };
 
 export default RecaptchaProvider;

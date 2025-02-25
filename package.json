@@ -20,6 +20,7 @@
     "npm": "npm i && cd ./backend && npm i && cd .."
   },
   "dependencies": {
+    "@google-recaptcha/react": "^1.2.3",
     "@tailwindcss/vite": "^4.0.4",
     "docx": "^9.1.1",
     "github-url-to-object": "^4.0.6",
