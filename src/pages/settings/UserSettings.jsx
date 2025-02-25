@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import axios from "axios";
 
 function UserSettings() {
@@ -39,7 +40,7 @@ function UserSettings() {
 
     try {
       const endpoint = isLoginForm ? "/login" : "/register";
-      const response = await axios.post(`http://api.ido.vin:3001${endpoint}`, userData);
+      const response = await axios.post(`http://your-api-url${endpoint}`, userData);
       console.log("API Response:", response.data);
     } catch (err) {
       console.error("API Error:", err.response?.data || err.message);
@@ -102,7 +103,10 @@ function UserSettings() {
       </div>
 
       {/* Google reCAPTCHA */}
-      <div className="g-recaptcha" data-sitekey="6LdxA-IqAAAAAL-zX5WXpfZEgiBEkNRjUGMH24Ar" data-callback={handleRecaptcha}></div>
+      <ReCAPTCHA
+        sitekey="6LdxA-IqAAAAAL-zX5WXpfZEgiBEkNRjUGMH24Ar"
+        onChange={handleRecaptcha}
+      />
 
       <div className="relative w-full max-w-xl mx-auto bg-base-200 p-6 rounded-lg text-sm text-center">
         <p>{paragraphs[currentIndex]}</p>
