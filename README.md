@@ -1,4 +1,6 @@
-# iDO 1.0.2 Ollama Deepseek or chatgpt api 100% Privacy & File management functions
+# iDO can operate your computer using ChatGpt API or deepseek-R1 offline
+
+[Our website https://iDo.vin](https://ido.vin)
 
 [![Windows](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/windows.png?raw=true)](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/1.0.2/iDo-1.0.2-win32-x86_64.zip) 
 [![Linux](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/linux.png?raw=true)](https://github.com/DeepSeek-Ollama-Interface/iDo/releases/download/1.0.2/iDo-1.0.2-linux-x86_64.zip) 
