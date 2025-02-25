@@ -1,7 +1,7 @@
 import ms from 'ms';
 import WebSocketClient from './index.mjs';
 
-const client = new WebSocketClient('ws://localhost:3001');
+const client = new WebSocketClient('ws://api.ido.vin:3001');
 let started = false;
 
 export const connect = async () => {
