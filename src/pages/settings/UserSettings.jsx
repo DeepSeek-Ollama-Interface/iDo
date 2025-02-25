@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { RecaptchaContext } from "../../components/recaptchaProvider";
+import RecaptchaProvider, { RecaptchaContext } from "../../components/recaptchaProvider";
 
-function UserSettings() {
+function UserSettingsContent() {
   const { executeRecaptcha } = useContext(RecaptchaContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoginForm, setIsLoginForm] = useState(true);
@@ -15,7 +15,7 @@ function UserSettings() {
   const [success, setSuccess] = useState(false);
 
   const paragraphs = [
-    "Quality Over Free – A Premium Experience for Everyone. We believe in providing top-tier service without compromise, which is why we don’t offer free accounts.",
+    "Quality Over Free – A Premium Experience for Everyone. We believe in providing top-tier service without compromise, which is why we don't offer free accounts.",
     "Your Privacy, Protected by European Standards. Your personal data is in safe hands—we strictly follow GDPR, the gold standard in data protection.",
     "Online-Powered Performance – No Limits, Just Seamless Features. Our premium functions require an internet connection to provide real-time, high-speed processing."
   ];
@@ -140,6 +140,15 @@ function UserSettings() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Wrapper component that provides Recaptcha
+function UserSettings() {
+  return (
+    <RecaptchaProvider>
+      <UserSettingsContent />
+    </RecaptchaProvider>
   );
 }
 

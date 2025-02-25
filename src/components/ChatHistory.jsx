@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useChatHandlers } from "../ChatHandlersProvider";
 
 const ChatHistory = () => {
   const { loadChatById, selectedChatId } = useChatHandlers(); // Using context from provider
   const [isOpen, setIsOpen] = useState(false);
   const [chatItems, setChatItems] = useState([]);
+  const navRef = useRef(null); // Referință pentru navbar
+  const buttonRef = useRef(null); // Referință pentru buton
 
   // Fetch chat history on mount
   useEffect(() => {
@@ -39,16 +41,34 @@ const ChatHistory = () => {
     },
     [loadChatById]
   );
-  
-  return (
-    <div className="relative w-[20px]">
 
-      {/* Invisible Bar for Margins */}
-      <div className="absolute left-[3px] top-[20%] h-[50%] w-[100%] z-[99]">
-        {/* Toggle Button */}
+  // Handler pentru click-uri în afara navbar-ului
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        isOpen &&
+        navRef.current &&
+        !navRef.current.contains(event.target) &&
+        !buttonRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
+
+  return (
+    <div className="relative">
+      {/* Zona sensibilă la hover și butonul cu animație */}
+      <div className="fixed left-0 top-0 h-screen w-16 group flex items-center">
         <button
+          ref={buttonRef}
           onClick={() => setIsOpen(!isOpen)}
-          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 p-2 rounded-md cursor-pointer"
+          className="absolute -right-1 cursor-pointer z-50 px-6 py-10
+          opacity-0 group-hover:opacity-100 transform translate-x-[-100%] group-hover:translate-x-0
+          transition-all duration-300 ease-in-out"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -67,11 +87,12 @@ const ChatHistory = () => {
       {/* Sidebar Navigation */}
       {isOpen && (
         <nav
-        className="relative top-0 left-0 h-screen w-60 bg-[#2B2D31] text-[#B5BAC1] 
-        flex flex-col p-4 border-r border-[#1E1F22] 
-        transition-all duration-300 z-[9]"
-        style={{overflowY:"auto"}}
-      >      
+          ref={navRef}
+          className="fixed top-0 left-0 h-screen w-60 bg-[#2B2D31] text-[#B5BAC1] 
+          flex flex-col p-4 border-r border-[#1E1F22] 
+          transition-all duration-300 z-40"
+          style={{overflowY:"auto"}}
+        >
           {chatItems.map((item) => (
             <button
               key={item.id}
@@ -86,6 +107,9 @@ const ChatHistory = () => {
               {item.name}
             </button>
           ))}
+          <button className="mt-auto flex items-center justify-start text-text">
+            New Chat
+          </button>
         </nav>
       )}
     </div>

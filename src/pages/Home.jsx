@@ -27,35 +27,45 @@ export default function Home() {
   } = useChatHandlers();
 
   return (
-    <div className="h-full w-full flex">
-      <ChatHistory />
+    <div className="h-screen w-full flex relative overflow-hidden">
+      <div className="absolute top-0 left-0 z-50">
+        <ChatHistory />
+      </div>
 
-      <div className="flex flex-col h-full w-full" style={{maxHeight: "94%"}}>
-        <ModelSelect
-          selectedModel={selectedModel}
-          setSelectedModel={setSelectedModel}
-        />
+      <div className="flex flex-col h-full w-full">
+        <div className="flex-shrink-0">
+          <ModelSelect
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+          />
+        </div>
 
-        <ChatMessages
-          messages={messages}
-          containerRef={containerRef}
-          isThinking={isThinking}
-          thinkingMessages={thinkingMessages}
-          showThinkingMessages={showThinkingMessages}
-          toggleThinkingMessages={toggleThinkingMessages}
-          showReasoningMessageHistory={showReasoningMessageHistory}
-          setShowReasoningMessageHistory={setShowReasoningMessageHistory}
-          isCoding={isCoding}
-          isLoading={isLoading}
-          thinkingScrollRed={thinkingScrollRed}
-        />
+        <div className="flex-1 overflow-hidden">
+          <div className="h-[85%]">
+            <ChatMessages
+              messages={messages}
+              containerRef={containerRef}
+              isThinking={isThinking}
+              thinkingMessages={thinkingMessages}
+              showThinkingMessages={showThinkingMessages}
+              toggleThinkingMessages={toggleThinkingMessages}
+              showReasoningMessageHistory={showReasoningMessageHistory}
+              setShowReasoningMessageHistory={setShowReasoningMessageHistory}
+              isCoding={isCoding}
+              isLoading={isLoading}
+              thinkingScrollRed={thinkingScrollRed}
+            />
+          </div>
+        </div>
 
-        <ChatInput
-          userMessage={userMessage}
-          setUserMessage={setUserMessage}
-          handleUserMessage={handleUserMessage}
-          forceStreamEND={forceStreamEND}
-        />
+        <div className="flex-shrink-0 absolute bottom-0 w-full">
+          <ChatInput
+            userMessage={userMessage}
+            setUserMessage={setUserMessage}
+            handleUserMessage={handleUserMessage}
+            forceStreamEND={forceStreamEND}
+          />
+        </div>
       </div>
     </div>
   );
