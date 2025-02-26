@@ -62,7 +62,7 @@ const ChatHistory = () => {
   return (
     <div className="relative">
       {/* Zona sensibilă la hover și butonul cu animație */}
-      <div className="fixed left-0 top-10 w-16 h-[85%] group flex items-center">
+      <div className="fixed left-0 top-32 w-16 h-[72%] group flex items-center">
         <button
           ref={buttonRef}
           onClick={() => setIsOpen(!isOpen)}
