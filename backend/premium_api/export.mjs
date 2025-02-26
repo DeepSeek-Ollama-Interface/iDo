@@ -44,19 +44,41 @@ export async function* askAI(question) {
       const responseStream = client.askAI(question);
   
       for await (let msg of responseStream) {
-        console.log("📥 WebSocket Raw Response:", msg);
-  
         let formattedMsg = { message: { content: '' }, done: false };
-  
+        console.log("CHUNK >>");
+        console.dir(msg);
+        console.log("CHUNK >>");
         try {
           if (typeof msg === 'string') {
             msg = JSON.parse(msg);
           }
-  
-          formattedMsg = {
-            message: { content: msg.data.message.content || ' ' },
-            done: msg.data.done || false
-          };
+
+          if(
+            typeof msg === 'object' &&
+            msg.data && msg.data.message && msg.data.message.content
+          ){
+            if(msg.data.message.content && msg.data.message.content === '[DONE]'){
+                msg.data.message.content = '';
+            }
+
+            formattedMsg = {
+                message: { content: msg.data.message.content },
+                done: msg.data.done || false
+            };
+          } else if(
+            typeof msg === 'object' &&
+            msg.data
+          ){
+            formattedMsg = {
+                message: { content: msg.data },
+                done: msg.data.done || false
+            };
+          } else {
+            console.log("INTO THE UNKOWN <<<<<<<<<<<");
+          }
+          
+          console.log("FormattedMsg is:");
+          console.dir(formattedMsg);
   
         } catch (error) {
           console.error("❌ Error parsing WebSocket message:", error);

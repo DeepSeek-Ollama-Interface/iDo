@@ -8,5 +8,6 @@ export function getPrompt() {
 
 export async function analyzeResponse(script) {
   const response = injectPrompt.analyzeResponse(script);
+  console.dir(script);
   return response;
 }

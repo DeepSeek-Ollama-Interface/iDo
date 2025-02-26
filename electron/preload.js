@@ -32,7 +32,7 @@ ipcRenderer.on("ResponseAIIPC", (event, data) => {
   setLoading(false);
   if (data.stream) {
     document.dispatchEvent(new CustomEvent("ResponseAI", {
-      detail: [{ message: data.chunk, author: "ai" }]
+      detail: [{ message: data.chunk, author: "assistant" }]
     }));
   } else if (data.detail) {
     if (data.done){

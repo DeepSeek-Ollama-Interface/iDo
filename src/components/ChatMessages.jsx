@@ -11,7 +11,7 @@ export default function ChatMessages({
   setShowReasoningMessageHistory,
   isCoding,
   isLoading,
-  thinkingScrollRed
+  thinkingScrollRef
 }) {
   useEffect(() => {
     console.dir(messages);
@@ -100,7 +100,7 @@ export default function ChatMessages({
           thinkingMessages={thinkingMessages}
           showThinkingMessages={showThinkingMessages}
           toggleThinkingMessages={toggleThinkingMessages}
-          thinkingScrollRed={thinkingScrollRed}
+          thinkingScrollRef={thinkingScrollRef}
         />
       )}
       {isLoading && !isThinking && <LoadingSpinner />}
@@ -118,7 +118,7 @@ const CodingIndicator = () => (
   </div>
 );
 
-const ThinkingIndicator = ({ thinkingMessages, showThinkingMessages, toggleThinkingMessages, thinkingScrollRed }) => (
+const ThinkingIndicator = ({ thinkingMessages, showThinkingMessages, toggleThinkingMessages, thinkingScrollRef }) => (
   <div className="w-full max-h-[400px] overflow-hidden p-2 mt-2 rounded-lg backdrop-blur-lg">
     <div className="text-center mb-2">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
@@ -137,7 +137,7 @@ const ThinkingIndicator = ({ thinkingMessages, showThinkingMessages, toggleThink
           </p>
         </div>
       ))}
-      <div ref={thinkingScrollRed} />
+      <div ref={thinkingScrollRef} />
     </div>
   </div>
 );

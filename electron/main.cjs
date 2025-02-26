@@ -474,7 +474,7 @@ ipcMain.on('abortAll', async () => {
 });
 
 async function chatCompletion(data) {
-  const backend = await import('../backend/export.mjs');
+  const backend = await import('../backend/deepseek_middleware/export.mjs');
   return backend.chatCompletion(data);
 }
 
@@ -505,9 +505,11 @@ async function loadExecuteFunction(callback) {
 ipcMain.on('executeFunction', async (event, data) => {
   try {
     const result = await loadExecuteFunction(data);
+    console.log(`executeFunction-response: ${result}`);
+
     event.reply('executeFunction-response', result);
   } catch (error) {
-    event.reply('executeFunction-response', { error: error.message });
+    event.reply('executeFunction-response', { error: error.message || 'Unknown error' });
   }
 });
 
@@ -575,7 +577,7 @@ ipcMain.handle("renameChat", async (event, chatId, newName) => {
 });
 
 async function createStreamHandler(callback) {
-  const backend = await import('../backend/export.mjs');
+  const backend = await import('../backend/deepseek_middleware/export.mjs');
   return backend.createStreamHandler(callback);
 }
 

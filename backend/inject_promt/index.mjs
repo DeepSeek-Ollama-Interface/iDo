@@ -104,18 +104,30 @@ class InjectPromptCore {
   
       let stdoutData = '';
       let stderrData = '';
+
+            // Timeout after 5 seconds
+            const timeout = setTimeout(() => {
+              timeoutBool = true;
+
+              child.kill();
+              child.kill('SIGKILL');  // Force kill the process
+              console.log("Process killed by timeout");
+            }, 5000);  // 5 seconds
   
       child.stdout.on('data', (data) => {
+        console.log(data.toString());
         stdoutData += data.toString();
       });
   
       child.stderr.on('data', (data) => {
+        console.log(data.toString());
         stderrData += data.toString();
       });
   
       child.on('close', (code) => {
+        console.log(`temp.js close code: ${code}`);
         let result = {
-          exitCode: code,
+          exitCode: code ? code : '1',
           stdout: stdoutData.trim(),
           stderr: stderrData.trim(),
         };
@@ -124,25 +136,16 @@ class InjectPromptCore {
         fs.unlinkSync(scriptPath);
   
         if(!timeoutBool){
+          clearTimeout(timeout);
           resolve(JSON.stringify(result));
         } else {
           result.exitCode = "This is an infinite process, this may be normal and not an error, it works as intended but unfortunately we cannot keep them so it had to be killed. This may be an old process dying, you can ignore this message."
+          clearTimeout(timeout);
           resolve(JSON.stringify(result));
         }
         
       });
   
-      // Timeout after 60 seconds
-      const timeout = setTimeout(() => {
-        timeoutBool = true;
-        child.kill('SIGKILL');  // Force kill the process
-        console.log("Process killed by timeout");
-      }, 60000);  // 60 seconds
-  
-      // Clear timeout if process finishes within 60 seconds
-      child.on('close', () => {
-        clearTimeout(timeout);
-      });
     });
   }
  

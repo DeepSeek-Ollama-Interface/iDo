@@ -5,7 +5,7 @@ import os, { type } from 'os';
 import { getPrompt, analyzeResponse} from '../inject_promt/export.mjs';
 import { getSetting } from '../local_settings/export.mjs';
 import { askAI, abortAll as abortAllGPT } from '../chatgpt_api/export.mjs';
-import { askAI as askAIpremium, connect, login } from '../premium_api/export.mjs';
+import { askAI as askAIpremium, closeConnection as closeConnectionPremiumApi } from '../premium_api/export.mjs';
 
 export class DeepSeekCore {
   constructor() {
@@ -193,6 +193,7 @@ export class DeepSeekCore {
     try {
       ollama.abort();
       abortAllGPT();
+      closeConnectionPremiumApi();
       return true;
     } catch(e){
       console.error(e);

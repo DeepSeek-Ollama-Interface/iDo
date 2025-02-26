@@ -14,7 +14,7 @@ function validateMessages(messages) {
       throw new Error(`Message ${index + 1} must be an object`);
     }
 
-    if(msg.author === 'ai') continue;
+    if(msg.author === 'assistant') continue;
 
     console.debug(`\u001b[31m DEBUG EXPORT.MJS validateMessages MESSAGES ${JSON.stringify(msg)} \u001b[0m`) // DEBUG
 

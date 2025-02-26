@@ -19,7 +19,7 @@ export default function Home() {
     selectedModel,
     setSelectedModel,
     containerRef,
-    thinkingScrollRed,
+    thinkingScrollRef,
     handleUserMessage,
     forceStreamEND,
     toggleThinkingMessages,
@@ -53,7 +53,7 @@ export default function Home() {
               setShowReasoningMessageHistory={setShowReasoningMessageHistory}
               isCoding={isCoding}
               isLoading={isLoading}
-              thinkingScrollRed={thinkingScrollRed}
+              thinkingScrollRef={thinkingScrollRef}
             />
           </div>
         </div>

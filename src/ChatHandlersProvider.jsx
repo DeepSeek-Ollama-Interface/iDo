@@ -18,7 +18,7 @@ export function ChatHandlersProvider({ children }) {
   const [selectedChatId, setSelectedChatId] = useState(null);
 
   const containerRef = useRef(null);
-  const thinkingScrollRed = useRef(null);
+  const thinkingScrollRef = useRef(null);
 
   // Scroll to bottom of chat
   const scrollToBottom = useCallback(() => {
@@ -47,62 +47,93 @@ export function ChatHandlersProvider({ children }) {
     setIsLoading(false);
     const response = event.detail;
 
-    if (isThinking) {
-      setThinkingMessages((prev) => {
-        const newMessages = [...prev];
-      let lastMessage = newMessages[newMessages.length - 1];
-        
-        if (response.stream && response.chunk) {
-          console.dir(response);
-          lastMessage.message += response.chunk;
-        } else if (response[0]?.message) {
-          try {
-            lastMessage.message += response[0].message;
-          } catch(e){
-            console.dir(e);
-          }
+    console.log("AI response");
+    console.dir(response);
+
+    if (response.stream && response.chunk) {
+        if(JSON.stringify(response.chunk).includes('<think>') && !JSON.stringify(response.chunk).includes('</think>')){
+            setIsThinking(true);
         }
-        
-        thinkingScrollRed.current?.scrollIntoView({ behavior: "smooth" });
-        return newMessages;
-      });
+    } else if (response[0]?.message) {
+        if(JSON.stringify(response[0]?.message).includes('<think>') && !JSON.stringify(response[0]?.message).includes('</think>')){
+            setIsThinking(true);
+        }
     }
 
-    if (!isThinking) {
-      setMessages((prev) => {
-        const newMessages = [...prev];
-
-        const getLastAIMessageIndex = [...prev].reverse().find(
-          msg => (msg.author?.toLowerCase() === "ai" || msg.role?.toLowerCase() === "ai")
-        );
-        
-
-        // AICI create new state for isStreaming and check if streaming or not
-        if (getLastAIMessageIndex) {
+    if (isThinking) {
+        setThinkingMessages((prev) => {
+          let newMessages = [...prev];
+          let lastMessage = newMessages[newMessages.length - 1];
+    
+          // Ensure lastMessage is always an object
+          if (!lastMessage) {
+            lastMessage = { role: "assistant", author: "assistant", message: "" };
+            newMessages.push(lastMessage);
+          }
+    
+          // Update message properly based on stream or static message
           if (response.stream && response.chunk) {
-            getLastAIMessageIndex.message += response.chunk;
+            lastMessage.message += String(response.chunk); // Ensure it's a string
           } else if (response[0]?.message) {
-            try {
-              getLastAIMessageIndex.message += response[0].message;
-            } catch(e){
-                console.dir(e);
+            if (!lastMessage.message) {
+              newMessages[newMessages.length - 1] = {
+                role: "assistant",
+                author: "assistant",
+                message: String(response[0].message), // Convert to string
+              };
+            } else {
+              lastMessage.message += String(response[0].message);
             }
           }
-        } else {
-          // handle new message push
-        }
-
-        scrollToBottom();
-        return newMessages;
-      });
+    
+          thinkingScrollRef.current?.scrollIntoView({ behavior: "smooth" });
+          return [...newMessages];
+        });
+      } else {
+        setMessages((prev) => {
+          let newMessages = [...prev];
+    
+          // Ensure last AI message is updated properly
+          if (aiMessageIndex !== null && newMessages[aiMessageIndex]) {
+            let lastMessage = newMessages[aiMessageIndex];
+    
+            if (!lastMessage) {
+              lastMessage = newMessages[newMessages.length - 1];
+            }
+    
+            if (response.stream && response.chunk) {
+              lastMessage.message += String(response.chunk); // Ensure it's a string
+            } else if (response[0]?.message) {
+              if (!lastMessage.message) {
+                newMessages[aiMessageIndex] = {
+                  role: "assistant",
+                  author: "assistant",
+                  message: String(response[0].message), // Convert to string
+                };
+              } else {
+                lastMessage.message += String(response[0].message);
+              }
+            }
+          } else if (response[0]?.message) {
+            newMessages.push({
+              message: String(response[0].message), // Convert to string
+              author: "assistant",
+              role: "assistant",
+            });
+            setAiMessageIndex(newMessages.length - 1);
+          }
+    
+          scrollToBottom();
+          return newMessages;
+        });
     }
 
-    const lastAIMessage = [...messages].reverse().find(msg => msg.author.toLowerCase() === 'ai');
+    const lastAIMessage = [...messages].reverse().find(msg => msg.author.toLowerCase() === 'assistant');
     if (lastAIMessage?.message) {
       if (lastAIMessage.message.includes("<func>") && !lastAIMessage.message.includes("</func>")) {
         setIsCoding(true);
       }
-      
+
       if (lastAIMessage.message.includes("<think>") && !lastAIMessage.message.includes("</think>")) {
         setThinkingMessages((prev) => [...prev, lastAIMessage]);
         setMessages((prev) => prev.slice(0, prev.length - 1));
@@ -133,6 +164,7 @@ export function ChatHandlersProvider({ children }) {
         setThinkingMessages([]);
       }
     }
+    
   }, [isThinking, messages, aiMessageIndex, thinkingMessages, scrollToBottom]);
 
   const handleFakeUserMessage = useCallback((msg) => {
@@ -190,12 +222,7 @@ export function ChatHandlersProvider({ children }) {
     setAiMessageIndex(null);
     setIsLoading(false);
 
-    const getLastAIMessageIndex = [...messages].reverse().find(
-      msg => (msg.author?.toLowerCase() === "ai" || msg.role?.toLowerCase() === "ai")
-    );
-
-    console.dir(getLastAIMessageIndex);
-    
+    const getLastAIMessageIndex = [...messages].reverse().find(msg => msg.author.toLowerCase() === "assistant");
     if (getLastAIMessageIndex?.message) {
       const command = getLastAIMessageIndex.message.match(/<func>(.*?)<\/func>/s);
       if (command?.[1]) {
@@ -257,7 +284,7 @@ export function ChatHandlersProvider({ children }) {
         selectedChatId,
         loadChatById,
         containerRef,
-        thinkingScrollRed,
+        thinkingScrollRef,
         handleUserMessage,
         forceStreamEND,
         toggleThinkingMessages,

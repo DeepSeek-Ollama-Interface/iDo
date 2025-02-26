@@ -57,14 +57,14 @@ export default class WebSocketClient {
   sendClosureMessage() {
     while (this.messageQueue.length > 0) {
       const resolver = this.messageQueue.shift();
-      resolver({ done: true });
+      resolver({message: {content: 'disconnected'}, done: true });
     }
   }
 
   sendErrorMessage(err) {
     while (this.messageQueue.length > 0) {
       const resolver = this.messageQueue.shift();
-      resolver({ error: true, message: err.message });
+      resolver({ status: 'error', error: true, message: {content: err.message}, done: true });
     }
   }
 
@@ -92,7 +92,14 @@ export default class WebSocketClient {
 
   async *askAI(question) {
     console.log(`Asked AI: ${question}`);
-    if (!this.isConnected) throw new Error('Not connected to WebSocket');
+    if (!this.isConnected) {
+        try {
+            this.connect();
+            this.login("AUTO-LOGIN");
+        } catch(e){
+            throw new Error('Not connected to WebSocket')
+        }
+    };
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     this.sendMessage({ event: 'AskAI', payload: { question } });
