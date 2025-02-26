@@ -50,17 +50,16 @@ export function ChatHandlersProvider({ children }) {
     if (isThinking) {
       setThinkingMessages((prev) => {
         const newMessages = [...prev];
-        const lastMessage = newMessages[newMessages.length - 1];
+      let lastMessage = newMessages[newMessages.length - 1];
         
         if (response.stream && response.chunk) {
+          console.dir(response);
           lastMessage.message += response.chunk;
         } else if (response[0]?.message) {
           try {
             lastMessage.message += response[0].message;
           } catch(e){
-            console.dir(lastMessage);
-            lastMessage = {"role": "ai", "author": "ai", "message": ""};
-            lastMessage.message += '';
+            console.dir(e);
           }
         }
         
@@ -72,32 +71,25 @@ export function ChatHandlersProvider({ children }) {
     if (!isThinking) {
       setMessages((prev) => {
         const newMessages = [...prev];
-        
-        if (aiMessageIndex !== null && newMessages[aiMessageIndex]) {
-          let lastMessage = newMessages[aiMessageIndex];
 
-          if(!lastMessage){
-            lastMessage = newMessages[messages.length - 1];
-          }
-          
+        const getLastAIMessageIndex = [...prev].reverse().find(
+          msg => (msg.author?.toLowerCase() === "ai" || msg.role?.toLowerCase() === "ai")
+        );
+        
+
+        // AICI create new state for isStreaming and check if streaming or not
+        if (getLastAIMessageIndex) {
           if (response.stream && response.chunk) {
-            lastMessage.message += response.chunk;
+            getLastAIMessageIndex.message += response.chunk;
           } else if (response[0]?.message) {
             try {
-                lastMessage.message += response[0].message;
+              getLastAIMessageIndex.message += response[0].message;
             } catch(e){
-                console.dir(lastMessage);
-                lastMessage = {"role": "ai", "author": "ai", "message": ""};
-                lastMessage.message += '';
+                console.dir(e);
             }
           }
-        } else if (response[0]?.message) {
-          newMessages.push({
-            message: response[0].message,
-            author: "ai",
-            role: "assistant",
-          });
-          setAiMessageIndex(newMessages.length - 1);
+        } else {
+          // handle new message push
         }
 
         scrollToBottom();
@@ -198,7 +190,12 @@ export function ChatHandlersProvider({ children }) {
     setAiMessageIndex(null);
     setIsLoading(false);
 
-    const getLastAIMessageIndex = [...messages].reverse().find(msg => msg.author.toLowerCase() === "ai");
+    const getLastAIMessageIndex = [...messages].reverse().find(
+      msg => (msg.author?.toLowerCase() === "ai" || msg.role?.toLowerCase() === "ai")
+    );
+
+    console.dir(getLastAIMessageIndex);
+    
     if (getLastAIMessageIndex?.message) {
       const command = getLastAIMessageIndex.message.match(/<func>(.*?)<\/func>/s);
       if (command?.[1]) {

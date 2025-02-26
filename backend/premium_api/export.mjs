@@ -40,11 +40,8 @@ export async function* askAI(question) {
   
     try {
       await start();
-      console.log("📨 Asking WebSocket AI:", question);
   
       const responseStream = client.askAI(question);
-  
-      console.log("🕵️‍♂️ Debug - Got ResponseStream:", responseStream);
   
       for await (let msg of responseStream) {
         console.log("📥 WebSocket Raw Response:", msg);
@@ -65,8 +62,7 @@ export async function* askAI(question) {
           console.error("❌ Error parsing WebSocket message:", error);
           formattedMsg = { message: { content: "Error processing message" }, done: true };
         }
-  
-        console.log("✅ Yielding formatted message:", formattedMsg);
+
         yield formattedMsg;
   
         if (formattedMsg.done) {
