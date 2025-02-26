@@ -149,7 +149,7 @@ export default function ChatInput({
         value={userMessage}
         onChange={(e) => setUserMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="w-full p-2 border-none focus:ring-0 outline-none"
+        className="w-full p-2 overflow-y-auto h-full max-h-22 border-none focus:ring-0 outline-none resize-none text-md"
         placeholder="Write a message..."
         rows={1}
       />

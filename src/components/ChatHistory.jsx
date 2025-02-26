@@ -62,7 +62,11 @@ const ChatHistory = () => {
   return (
     <div className="relative">
       {/* Zona sensibilă la hover și butonul cu animație */}
+<<<<<<< HEAD
       <div className="fixed left-0 top-[25%] h-[60%] w-16 group flex items-center">
+=======
+      <div className="fixed left-0 top-10 w-16 h-[85%] group flex items-center">
+>>>>>>> ff3471a (Chat history sidebar fixed)
         <button
           ref={buttonRef}
           onClick={() => setIsOpen(!isOpen)}

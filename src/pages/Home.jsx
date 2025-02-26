@@ -28,7 +28,7 @@ export default function Home() {
 
   return (
     <div className="h-screen w-full flex relative overflow-hidden">
-      <div className="absolute top-0 left-0 z-50">
+      <div className="absolute top-0 left-0 z-[100]">
         <ChatHistory />
       </div>
 
