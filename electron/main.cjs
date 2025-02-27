@@ -434,7 +434,7 @@ runOllama();
 
 //user promt is not part of settings
 async function updateSystemPrompt(string) {
-  const backend = await import('../backend/export.mjs');
+  const backend = await import('../backend/deepseek_middleware/export.mjs');
   return backend.updateSystemPrompt(string);
 }
 ipcMain.on('updateSystemPrompt', async (event, data) => {
@@ -499,7 +499,7 @@ ipcMain.on('chatCompletion', async (event, data) => {
 });
 
 async function loadExecuteFunction(callback) {
-  const backend = await import('../backend/export.mjs');
+  const backend = await import('../backend/inject_promt/export.mjs');
   return backend.analyzeResponse(callback);
 }
 
@@ -522,7 +522,7 @@ ipcMain.on("executeFunction", async (event, data) => {
 // IPC handlers for Chat History functions (getChat, addMessage, createChat, deleteChat)
 ipcMain.handle("getChat", async (event, chatId) => {
   try {
-    const { getChat } = await import("../backend/export.mjs");
+    const { getChat } = await import("../backend/chat_history/export.mjs");
     return await getChat(chatId);
   } catch (error) {
     console.error("Error in getChat:", error);
@@ -534,7 +534,7 @@ ipcMain.handle("getChat", async (event, chatId) => {
 ipcMain.handle("addMessage", async (event, chatId, messageObject, chatType, otherOptions) => {
   try {
     console.log(`In ipcMain Handle im looking for ${chatId}`);
-    const { addMessage } = await import("../backend/export.mjs");
+    const { addMessage } = await import("../backend/chat_history/export.mjs");
     return await addMessage(chatId, messageObject, chatType, otherOptions);
   } catch (error) {
     console.error("Error in addMessage:", error);
@@ -544,7 +544,7 @@ ipcMain.handle("addMessage", async (event, chatId, messageObject, chatType, othe
 
 ipcMain.handle("createChat", async (event, chatObject) => {
   try {
-    const { createChat } = await import("../backend/export.mjs");
+    const { createChat } = await import("../backend/chat_history/export.mjs");
     return await createChat(chatObject);
   } catch (error) {
     console.error("Error in createChat:", error);
@@ -554,7 +554,7 @@ ipcMain.handle("createChat", async (event, chatObject) => {
 
 ipcMain.handle("deleteChat", async (event, chatId) => {
   try {
-    const { deleteChat } = await import("../backend/export.mjs");
+    const { deleteChat } = await import("../backend/chat_history/export.mjs");
     return await deleteChat(chatId);
   } catch (error) {
     console.error("Error in deleteChat:", error);
@@ -564,7 +564,7 @@ ipcMain.handle("deleteChat", async (event, chatId) => {
 
 ipcMain.handle("getAllChats", async (event) => {
    try {
-     const { getAllChats } = await import("../backend/export.mjs");
+     const { getAllChats } = await import("../backend/chat_history/export.mjs");
      return await getAllChats();
    } catch (error) {
      console.error("Error in getAllChats:", error);
@@ -574,7 +574,7 @@ ipcMain.handle("getAllChats", async (event) => {
 
 ipcMain.handle("renameChat", async (event, chatId, newName) => {
    try {
-     const { renameChat } = await import("../backend/export.mjs");
+     const { renameChat } = await import("../backend/chat_history/export.mjs");
      return await renameChat(chatId, newName);
    } catch (error) {
      console.error("Error in renameChat:", error);
