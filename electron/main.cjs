@@ -506,7 +506,7 @@ async function loadExecuteFunction(callback) {
 ipcMain.on("executeFunction", async (event, data) => {
   try {
     const result = await loadExecuteFunction(data);
-    console.log("executeFunction-response:");
+    console.log(`executeFunction-response: ${result}`);
 
     // Use event.sender.send instead of event.reply
     mainWindow.webContents.send('ResponseAIIPC', { details: { message: true } });

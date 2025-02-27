@@ -6,6 +6,12 @@ class InjectPromptCore {
   constructor() {
     this.functions = [
 
+      // Web Browsing Functions
+      { name: "searchOnInternet", params: ["value: string"] },
+      { name: "makeRequest", params: ["method: string", "url: string", "port?: string | null", "header?: string | null", "body?: string | null"] },
+      { name: "openLinkInUserWebBrowser", params: ["url: string"] },
+      { name: "playOnYoutube", params: ["search?: string | null", "url?: string | null"] },
+
       // File System Functions
       { name: "listAll", params: ["inputPath: string"] },
       { name: "listDirectories", params: ["inputPath: string"] },
