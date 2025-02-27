@@ -145,7 +145,7 @@ class InjectPromptCore {
           clearTimeout(timeout);
           resolve(JSON.stringify(result));
         } else {
-          result.exitCode = "This is an infinite process, this may be normal and not an error, it works as intended but unfortunately we cannot keep them so it had to be killed. This may be an old process dying, you can ignore this message."
+          result.exitCode = "This is an infinite process, this may be normal and not an error, it works as intended but unfortunately we cannot keep them so it had to be killed. If you want to run the script in loop, create a child process detached."
           clearTimeout(timeout);
           resolve(JSON.stringify(result));
         }

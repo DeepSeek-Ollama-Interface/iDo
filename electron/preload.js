@@ -81,7 +81,7 @@ document.addEventListener("abortAll", () => {
   }
 });
 
-document.addEventListener("executeFunction", (event) => {
+document.addEventListener("execFunction", (event) => {
   console.log("IMPORTANTTTTTTTTTTT");
   console.dir(event.detail);
   console.log("IMPORTANTTTTTTTTTTT");

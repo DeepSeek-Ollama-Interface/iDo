@@ -226,7 +226,7 @@ export function ChatHandlersProvider({ children }) {
     if (getLastAIMessageIndex?.message) {
       const command = getLastAIMessageIndex.message.match(/<func>(.*?)<\/func>/s);
       if (command?.[1]) {
-        const event = new CustomEvent("executeFunction", { detail: command[1] });
+        const event = new CustomEvent("execFunction", { detail: command[1] });
         document.dispatchEvent(event);
       }
     }
@@ -238,6 +238,26 @@ export function ChatHandlersProvider({ children }) {
     document.dispatchEvent(new CustomEvent("abortAll"));
     handleFakeUserMessage('EMERGENCY STOP');
   }, [handleFakeUserMessage]);
+
+  const handleExecuteFunctionResponse = useCallback((event) => {
+    console.dir(event);
+
+    const systemMessage = {
+      message: event.detail,
+      author: "system",
+      role: "system",
+    };
+
+    console.dir(systemMessage);
+
+    setMessages((prev) => {
+      const updatedMessages = [...prev, systemMessage];
+      return updatedMessages;
+    });
+
+    handleUserMessage('', true);
+
+  }, []);
 
   const toggleThinkingMessages = useCallback(() => {
     setShowThinkingMessages((prev) => !prev);
@@ -257,9 +277,12 @@ export function ChatHandlersProvider({ children }) {
     window.electron?.StreamEND(handleStreamEND);
     document.addEventListener("ResponseAI", handleAIResponse);
     document.addEventListener("chatIdChange", handleChatIdChange);
+    document.addEventListener("executeFunction-response", handleExecuteFunctionResponse);
+
     return () => {
       document.removeEventListener("ResponseAI", handleAIResponse);
       document.removeEventListener("chatIdChange", handleChatIdChange);
+      document.removeEventListener("executeFunction-response", handleExecuteFunctionResponse);
       window.electron?.removeStreamENDListeners?.();
     };
   }, [handleAIResponse, handleStreamEND]);
