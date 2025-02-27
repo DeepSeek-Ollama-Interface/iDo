@@ -96,7 +96,7 @@ document.addEventListener("executeFunction", (event) => {
 });
 
 ipcRenderer.on("executeFunction-response", (event, response) => {
-  console.log("Received response from main process:", response);
+  console.log("PRELOAD: Received response from main prDEBUGocess:", response); // Debugging log
 
   // Dispatch a document event with the response details
   const responseEvent = new CustomEvent("executeFunction-response", {

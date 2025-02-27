@@ -502,16 +502,22 @@ async function loadExecuteFunction(callback) {
   const backend = await import('../backend/export.mjs');
   return backend.analyzeResponse(callback);
 }
-ipcMain.on('executeFunction', async (event, data) => {
+
+ipcMain.on("executeFunction", async (event, data) => {
   try {
     const result = await loadExecuteFunction(data);
-    console.log(`executeFunction-response: ${result}`);
+    console.log("executeFunction-response:");
 
-    event.reply('executeFunction-response', result);
+    // Use event.sender.send instead of event.reply
+    mainWindow.webContents.send('ResponseAIIPC', { details: { message: true } });
+
+    mainWindow.webContents.send("executeFunction-response", result);
   } catch (error) {
-    event.reply('executeFunction-response', { error: error.message || 'Unknown error' });
+    console.error("Error in executeFunction:", error);
+    event.sender.send("executeFunction-response", { error: error.message || "Unknown error" });
   }
 });
+
 
 // IPC handlers for Chat History functions (getChat, addMessage, createChat, deleteChat)
 ipcMain.handle("getChat", async (event, chatId) => {
