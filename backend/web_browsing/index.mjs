@@ -16,20 +16,28 @@ class WebBrowsing {
 
     await this._waitForPageLoad();
 
-    console.log("Fetching webpage content via WebSocketHandler...");
-    const pageContent = await this._getProcessedContent();
+    console.log("Requesting webpage content via WebSocketHandler...");
+    
+    // Get a WebSocket connection and request content
+    const pageContent = await this._fetchProcessedContent();
 
     return pageContent;
   }
 
-  async _getProcessedContent() {
-    // Wait for processed content from the extension
+  async _fetchProcessedContent() {
     return new Promise((resolve, reject) => {
       this.extension.wss.on('connection', (ws) => {
+        // Request page content explicitly
+        this.extension.requestPageContent(ws);
+
         ws.on('message', (message) => {
-          const msg = JSON.parse(message);
-          if (msg.action === 'processedContent') {
-            resolve(msg.textContent); // Get processed text content
+          try {
+            const msg = JSON.parse(message);
+            if (msg.action === 'processedContent') {
+              resolve(msg.textContent); // Get processed text content
+            }
+          } catch (error) {
+            reject("❌ Error parsing WebSocket message: " + error);
           }
         });
       });

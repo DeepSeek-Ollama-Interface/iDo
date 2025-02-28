@@ -9,6 +9,12 @@ class WebSocketHandler {
         this.pageContent = "";  // Store the page content
     }
 
+    requestPageContent(ws) {
+        if (ws && ws.readyState === ws.OPEN) {
+            ws.send(JSON.stringify({ action: "fetchPageContent" }));
+        }
+    }    
+
     start() {
         this.wss.on('connection', (ws) => {
             this.clientData.set(ws, ""); // Initialize empty buffer
@@ -16,7 +22,6 @@ class WebSocketHandler {
             ws.on('message', (message) => this.handleMessage(ws, message));
 
             // Request page content immediately upon connection
-            ws.send(JSON.stringify({ action: "fetchPageContent" }));
         });
     }
 
