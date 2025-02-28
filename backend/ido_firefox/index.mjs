@@ -1,4 +1,5 @@
 import { WebSocketServer } from 'ws';
+import { JSDOM } from "jsdom"; // Use require("jsdom") for CommonJS
 
 class WebSocketHandler {
     constructor(port = 5566) {
@@ -41,9 +42,9 @@ class WebSocketHandler {
                 ws.terminate();
             }
 
-            if (msg.action === "debugEvent") {
-                console.log(`🐛 DEBUG: ${msg.event}`, msg.data || '');
-            }
+            // if (msg.action === "debugEvent") {
+            //     console.log(`🐛 DEBUG: ${msg.event}`, msg.data || '');
+            // }
 
         } catch (error) {
             console.log("❌ Error parsing message:", error);
@@ -57,27 +58,25 @@ class WebSocketHandler {
 
     extractBodyText(html) {
         try {
-            const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-            if (!bodyMatch) {
-                console.log("❌ No <body> found in HTML.");
-                return html;
-            }
-
-            let bodyContent = bodyMatch[1];
-
-            // Preserve only <a> tags and plain text, stripping everything else
-            bodyContent = bodyContent
-                .replace(/<a\s+[^>]*href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi, '[ $2 → $1 ]') // Keep links as "[ text → url ]"
-                .replace(/<\/?[^>]+>/g, ''); // Remove all other tags
-
-            // Normalize whitespace
-            return bodyContent.replace(/\s+/g, ' ').trim();
-
+            const dom = new JSDOM(html);
+            const document = dom.window.document;
+    
+            // Remove scripts, styles, and hidden elements
+            document.querySelectorAll("script, style, noscript, head, meta, link").forEach(el => el.remove());
+    
+            // Extract only visible text
+            let bodyText = document.body.textContent || "";
+            bodyText = bodyText.trim().replace(/\s+/g, ' '); // Normalize spaces
+    
+            // Limit to 9000 characters
+            return bodyText.length > 2000 ? bodyText.substring(0, 2000) : bodyText;
+    
         } catch (error) {
-            console.log("❌ Error extracting body text:", error);
+            console.error("❌ Error extracting body text:", error);
             return "Error Reading webpage";
         }
-    }
+    }    
+    
 }
 
 
