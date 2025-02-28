@@ -59,6 +59,24 @@ const ChatHistory = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
+  // Function to handle creating a new chat
+  const handleNewChat = async () => {
+    try {
+      const newChat = await window.electron.createChat({});
+      console.log("New chat created:", newChat);
+      // Asigură-te că newChat are toate proprietățile necesare
+      const chatToAdd = {
+        id: newChat.id,
+        name: newChat.name || `Chat ${newChat.id.slice(0, 5)}`,
+        icon: "💬",
+      };
+      // Actualizează starea chatItems pentru a include noul chat
+      setChatItems((prevItems) => [...prevItems, chatToAdd]);
+    } catch (error) {
+      console.error("Failed to create new chat:", error);
+    }
+  };
+
   return (
     <div className="relative">
       {/* Zona sensibilă la hover și butonul cu animație */}
@@ -107,7 +125,10 @@ const ChatHistory = () => {
               {item.name}
             </button>
           ))}
-          <button className="mt-auto flex items-center justify-start text-text">
+          <button
+            className="mt-auto flex items-center justify-start text-text hover:cursor-pointer transition-colors cursor-pointer rounded-lg hover:bg-[#404249]/70 p-2"
+            onClick={handleNewChat}
+          >
             New Chat
           </button>
         </nav>
