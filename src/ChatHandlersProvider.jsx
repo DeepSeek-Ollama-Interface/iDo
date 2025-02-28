@@ -217,7 +217,6 @@ export function ChatHandlersProvider({ children }) {
   }, [selectedModel, scrollToBottom]);
 
   const handleStreamEND = useCallback(() => {
-    setIsCoding(false);
     setIsThinking(false);
     setAiMessageIndex(null);
     setIsLoading(false);
@@ -241,6 +240,7 @@ export function ChatHandlersProvider({ children }) {
 
   const handleExecuteFunctionResponse = useCallback((event) => {
     console.dir(event);
+    setIsCoding(false);
 
     const systemMessage = {
       message: event.detail,

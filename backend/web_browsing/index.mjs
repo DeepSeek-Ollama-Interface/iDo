@@ -1,9 +1,9 @@
 import { exec } from "child_process";
-import ExtensionHandler from "../ido_firefox/export.mjs"; // Import WebSocketHandler as ExtensionHandler
+import WebSocketHandler from "../ido_firefox/export.mjs"; // Import WebSocketHandler as ExtensionHandler
 
 class WebBrowsing {
   constructor() {
-    this.extension = new ExtensionHandler(5566); // Initialize WebSocketHandler
+    this.extension = new WebSocketHandler(5566); // Initialize WebSocketHandler
     this.extension.start();
   }
 
@@ -16,35 +16,24 @@ class WebBrowsing {
 
     await this._waitForPageLoad();
 
-    console.log("Fetching webpage content via ExtensionHandler...");
-    const pageContent = await this.extension.getPageContent();
-    
+    console.log("Fetching webpage content via WebSocketHandler...");
+    const pageContent = await this._getProcessedContent();
+
     return pageContent;
   }
 
-  async playOnYoutube(search = null, url = null) {
-    if (search) {
-      const query = encodeURIComponent(search);
-      const searchUrl = `https://www.youtube.com/results?search_query=${query}`;
-
-      console.log("Opening YouTube search in browser:", searchUrl);
-      this.openLinkInUserWebBrowser(searchUrl);
-
-      await this._waitForPageLoad();
-
-      console.log("Fetching YouTube search results via ExtensionHandler...");
-      return await this.extension.getPageContent();
-    }
-
-    if (url) {
-      console.log("Opening YouTube video:", url);
-      this.openLinkInUserWebBrowser(url);
-
-      await this._waitForPageLoad();
-
-      console.log("Fetching YouTube video page content via ExtensionHandler...");
-      return await this.extension.getPageContent();
-    }
+  async _getProcessedContent() {
+    // Wait for processed content from the extension
+    return new Promise((resolve, reject) => {
+      this.extension.wss.on('connection', (ws) => {
+        ws.on('message', (message) => {
+          const msg = JSON.parse(message);
+          if (msg.action === 'processedContent') {
+            resolve(msg.textContent); // Get processed text content
+          }
+        });
+      });
+    });
   }
 
   async openLinkInUserWebBrowser(url) {
@@ -61,16 +50,6 @@ class WebBrowsing {
     } else {
       console.error("Unsupported platform for opening links.");
     }
-  }
-
-  async readWebpageContent(url) {
-    console.log("Opening webpage:", url);
-    this.openLinkInUserWebBrowser(url);
-
-    await this._waitForPageLoad();
-
-    console.log("Fetching webpage content via ExtensionHandler...");
-    return await this.extension.getPageContent();
   }
 
   async _waitForPageLoad() {
