@@ -116,6 +116,7 @@ export class DeepSeekCore {
     console.log("🟢 Checkpoint 1: sysPromt loaded:", sysPromt);
 
     if (inject) {
+      console.log("INJECTING");
       try {
         promtToBeInjected = getPrompt();
         const alreadyInjected = payload.messages.some(

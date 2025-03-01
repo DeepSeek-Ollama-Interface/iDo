@@ -68,6 +68,9 @@ class InjectPromptCore {
 
   // TEST PROMPT
   getPrompt() {
+    const osType = os.type();
+    const osRelease = os.release();
+
     return `
       User granted you access to their computer, below is a list of available Node.js functions. To use them, write your code between <func> and </func> tags. Your script must be valid Node.js code and must import these functions from './export.mjs' like this: import { function1, function2 } from './export.mjs';
 
