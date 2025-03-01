@@ -46,9 +46,7 @@ export function ChatHandlersProvider({ children }) {
       if (chatData) {
         setMessages(chatData.messages || []);
         setSelectedChatId(chatId);
-        console.dir(`1 ${chatId}`);
-        console.dir(`2 ${chatData}`);
-        console.dir(`3 ${selectedChatId}`);
+        localStorage.setItem("chatId", chatId);
       }
     } catch (error) {
       console.error("Failed to load chat:", error);
@@ -211,25 +209,22 @@ export function ChatHandlersProvider({ children }) {
           },
         })
       );
+      
       if(!fake){
-        if (!selectedChatId) {
-            const tempselectedChatId = uuidv4(); // Generates a new unique ID
-            setSelectedChatId(tempselectedChatId);
-
-            console.dir(`4 ${tempselectedChatId}`);
-            console.dir(`5 ${selectedChatId}`);
-        }
-        window.electron?.addMessage(selectedChatId, newUserMessage, 'messages', { thinkingMessages, selectedModel, aiMessageIndex });
+        window.electron?.addMessage(selectedChatId, newUserMessage, 'messages', { 
+          thinkingMessages, 
+          selectedModel, 
+          aiMessageIndex 
+        });
         return updatedMessages;
       } else {
         return prev;
       }
-      
     });
     
     scrollToBottom();
     setUserMessage("");
-  }, [selectedModel, scrollToBottom]);
+  }, [selectedModel, scrollToBottom, selectedChatId]);
 
   const handleStreamEND = useCallback(() => {
     setIsThinking(false);

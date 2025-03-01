@@ -111,6 +111,13 @@ const ChatHistory = () => {
           transition-all duration-300 z-40"
           style={{overflowY:"auto"}}
         >
+            <button
+              key='newChat'
+              className={`flex items-center mb-4 p-2 w-full text-left rounded-lg transition-colors cursor-pointer bg-[#404249] hover:bg-[#404249]/70`}
+              onClick={() => handleNewChat()}
+            >
+              New Chat
+            </button>
           {chatItems.map((item) => (
             <button
               key={item.id}
@@ -125,12 +132,6 @@ const ChatHistory = () => {
               {item.name}
             </button>
           ))}
-          <button
-            className="mt-auto flex items-center justify-start text-text hover:cursor-pointer transition-colors cursor-pointer rounded-lg hover:bg-[#404249]/70 p-2"
-            onClick={handleNewChat}
-          >
-            New Chat
-          </button>
         </nav>
       )}
     </div>
