@@ -227,9 +227,11 @@ export function ChatHandlersProvider({ children }) {
   }, [selectedModel, scrollToBottom, selectedChatId]);
 
   const handleStreamEND = useCallback(() => {
+    console.dir("STREAM END --<<<<<<<<<<<<<<<<<<<<<")
     setIsThinking(false);
     setAiMessageIndex(null);
     setIsLoading(false);
+    console.dir("STREAM END --<<<<<<<<<<<<<<<<<<<<<")
 
     const getLastAIMessageIndex = [...messages].reverse().find(msg => msg.author.toLowerCase() === "assistant");
     if (getLastAIMessageIndex?.message) {
@@ -241,6 +243,7 @@ export function ChatHandlersProvider({ children }) {
     }
 
     window.electron?.addMessage(selectedChatId, messages[messages.length - 1], 'messages', { thinkingMessages, selectedModel, aiMessageIndex }); 
+    console.dir("STREAM END --<<<<<<<<<<<<<<<<<<<<<")
   }, [messages]);
 
   const forceStreamEND = useCallback(() => {
