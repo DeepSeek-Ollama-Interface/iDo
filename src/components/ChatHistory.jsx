@@ -7,6 +7,8 @@ const ChatHistory = () => {
   const [chatItems, setChatItems] = useState([]);
   const navRef = useRef(null); // Referință pentru navbar
   const buttonRef = useRef(null); // Referință pentru buton
+  const [editingChatId, setEditingChatId] = useState(null);
+  const [newChatName, setNewChatName] = useState('');
 
   // Fetch chat history on mount
   useEffect(() => {
@@ -26,8 +28,8 @@ const ChatHistory = () => {
         console.error("Failed to fetch chat history:", error);
       }
     }
-    fetchChatHistory();
-  }, []);
+    if(isOpen) fetchChatHistory(); // Only fetch when opening
+  }, [isOpen]);
 
   // Handle chat selection
   const handleChatSelect = useCallback(
@@ -77,6 +79,42 @@ const ChatHistory = () => {
     }
   };
 
+  // Add delete handler
+  const handleDeleteChat = async (chatId) => {
+    try {
+      await window.electron.deleteChat(chatId);
+      setChatItems(prev => prev.filter(chat => chat.id !== chatId));
+      if(selectedChatId === chatId) {
+        localStorage.removeItem("chatId");
+      }
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+    }
+  };
+
+  // Update handleRenameChat logic
+  const handleRenameChat = async (chatId, currentName) => {
+    setEditingChatId(chatId);
+    setNewChatName(currentName);
+  };
+
+  // Add save handler
+  const saveRenamedChat = async (chatId, originalName) => {
+    if (newChatName && newChatName !== originalName) {
+      try {
+        await window.electron.renameChat(chatId, newChatName);
+        setChatItems(prev => prev.map(chat => 
+          chat.id === chatId ? {...chat, name: newChatName} : chat
+        ));
+      } catch (error) {
+        console.error("Renaming failed:", error);
+        alert("Failed to rename chat. Please try again.");
+      }
+    }
+    setEditingChatId(null);
+    setNewChatName('');
+  };
+
   return (
     <div className="relative">
       {/* Zona sensibilă la hover și butonul cu animație */}
@@ -111,26 +149,65 @@ const ChatHistory = () => {
           transition-all duration-300 z-40"
           style={{overflowY:"auto"}}
         >
-            <button
-              key='newChat'
-              className={`flex items-center mb-4 p-2 w-full text-left rounded-lg transition-colors cursor-pointer bg-[#404249] hover:bg-[#404249]/70`}
-              onClick={() => handleNewChat()}
-            >
-              New Chat
-            </button>
+          <button
+            key='newChat'
+            className={`flex items-center mb-4 p-2 w-full text-left rounded-lg transition-colors cursor-pointer bg-[#404249] hover:bg-[#404249]/70`}
+            onClick={() => handleNewChat()}
+          >
+            New Chat
+          </button>
           {chatItems.map((item) => (
-            <button
-              key={item.id}
-              className={`flex items-center mb-4 p-2 w-full text-left rounded-lg transition-colors cursor-pointer ${
-                selectedChatId === item.id
-                  ? "bg-[#404249]"
-                  : "hover:bg-[#404249]/70"
-              }`}
-              onClick={() => handleChatSelect(item.id)}
-            >
-              <span className="mr-3">{item.icon}</span>
-              {item.name}
-            </button>
+            <div key={item.id} className="group flex items-center mb-4 hover:bg-[#404249]/70 rounded-lg">
+              <button
+                className={`flex-1 p-2 text-left rounded-lg transition-colors cursor-pointer ${
+                  selectedChatId === item.id ? "bg-[#404249]" : ""
+                }`}
+                onClick={() => handleChatSelect(item.id)}
+              >
+                <span className="mr-3">{item.icon}</span>
+                {editingChatId === item.id ? (
+                  <input
+                    type="text"
+                    value={newChatName}
+                    onChange={(e) => setNewChatName(e.target.value)}
+                    onBlur={() => saveRenamedChat(item.id, item.name)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') saveRenamedChat(item.id, item.name);
+                      if (e.key === 'Escape') setEditingChatId(null);
+                    }}
+                    className="bg-transparent border-b border-gray-500 focus:outline-none focus:border-blue-400 text-white"
+                    autoFocus
+                  />
+                ) : (
+                  <span>{item.name}</span>
+                )}
+              </button>
+              
+              {/* Action buttons */}
+              <div className="flex opacity-0 group-hover:opacity-100 transition-opacity space-x-1">
+                <button
+                  className="p-2 text-blue-400 hover:text-blue-300 hover:cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRenameChat(item.id, item.name);
+                  }}
+                  title="Rename chat"
+                >
+                  ✏️
+                </button>
+                
+                <button
+                  className="p-2 text-red-400 hover:text-red-300 hover:cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if(confirm(`Delete "${item.name}"?`)) handleDeleteChat(item.id)
+                  }}
+                  title="Delete chat"
+                >
+                  🗑
+                </button>
+              </div>
+            </div>
           ))}
         </nav>
       )}
