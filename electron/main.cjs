@@ -421,12 +421,12 @@ async function runOllama() {
   try {
     const res = await runOllamaProcess();
     if(!res){
-      console.error('Failed to run Ollama:', error);
-      shell.openExternal('https://ollama.com/');
+      console.log('Failed to run Ollama:', error);
+      // shell.openExternal('https://ollama.com/');
     }
   } catch (error) {
-    console.error('Failed to run Ollama:', error);
-    shell.openExternal('https://ollama.com/');
+    console.log('Failed to run Ollama:', error);
+    // shell.openExternal('https://ollama.com/');
   }
 }
 

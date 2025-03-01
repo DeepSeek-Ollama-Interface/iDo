@@ -120,13 +120,12 @@ export class DeepSeekCore {
       try {
         promtToBeInjected = getPrompt();
         const alreadyInjected = payload.messages.some(
-          (msg) => msg.author === "system-information" && msg.role === "system"
+          (msg) => msg.role === "system"
         );
       
         if (!alreadyInjected) {
           payload.messages.unshift({
             message: promtToBeInjected,
-            author: "system-information",
             role: "system",
           });
         }
