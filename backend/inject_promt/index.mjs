@@ -117,14 +117,14 @@ class InjectPromptCore {
       let stdoutData = '';
       let stderrData = '';
 
-            // Timeout after 20 seconds
+            // Timeout after 10 seconds
             const timeout = setTimeout(() => {
               timeoutBool = true;
 
               child.kill();
               child.kill('SIGKILL');  // Force kill the process
               console.log("Process killed by timeout");
-            }, 20000);  // 20 seconds
+            }, 10000);  // 10 seconds
   
       child.stdout.on('data', (data) => {
         console.log(data.toString());
@@ -139,7 +139,7 @@ class InjectPromptCore {
       child.on('close', (code) => {
         console.log(`temp.js close code: ${code}`);
         let result = {
-          exitCode: '0',
+          exitCode: code,
           stdout: stdoutData.trim(),
           stderr: stderrData.trim(),
         };
