@@ -15,10 +15,20 @@ export function ChatHandlersProvider({ children }) {
   const [isCoding, setIsCoding] = useState(false);
   const [showReasoningMessageHistory, setShowReasoningMessageHistory] = useState(false);
   const [selectedModel, setSelectedModel] = useState("ChatGPTapi~gpt-4o-mini");
-  const [selectedChatId, setSelectedChatId] = useState(null);
+  const [selectedChatId, setSelectedChatId] = useState(() => {
+    // Initialize from localStorage or create a new ID
+    return localStorage.getItem("chatId") || uuidv4();
+  });
 
   const containerRef = useRef(null);
   const thinkingScrollRef = useRef(null);
+
+  // Save selectedChatId to localStorage whenever it changes
+  useEffect(() => {
+    if (selectedChatId) {
+      localStorage.setItem("chatId", selectedChatId);
+    }
+  }, [selectedChatId]);
 
   // Scroll to bottom of chat
   const scrollToBottom = useCallback(() => {
@@ -36,7 +46,9 @@ export function ChatHandlersProvider({ children }) {
       if (chatData) {
         setMessages(chatData.messages || []);
         setSelectedChatId(chatId);
-        localStorage.setItem("chatId", chatId);
+        console.dir(`1 ${chatId}`);
+        console.dir(`2 ${chatData}`);
+        console.dir(`3 ${selectedChatId}`);
       }
     } catch (error) {
       console.error("Failed to load chat:", error);
@@ -203,6 +215,9 @@ export function ChatHandlersProvider({ children }) {
         if (!selectedChatId) {
             const tempselectedChatId = uuidv4(); // Generates a new unique ID
             setSelectedChatId(tempselectedChatId);
+
+            console.dir(`4 ${tempselectedChatId}`);
+            console.dir(`5 ${selectedChatId}`);
         }
         window.electron?.addMessage(selectedChatId, newUserMessage, 'messages', { thinkingMessages, selectedModel, aiMessageIndex });
         return updatedMessages;
@@ -268,9 +283,16 @@ export function ChatHandlersProvider({ children }) {
     setSelectedModel(savedModel);
   }, []);
 
+  useEffect(() => {
+    console.dir(`8 ${selectedChatId}`);
+  }, [selectedChatId]);
+
   const handleChatIdChange = useCallback((event) => {
     const id = event.detail;
     setSelectedChatId(id);
+
+    console.dir(`6 ${id}`);
+    console.dir(`7 ${selectedChatId}`);
   });
 
   useEffect(() => {
