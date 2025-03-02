@@ -17,7 +17,8 @@
     "dist:linux": "npm run build && electron-packager . iDo --platform=linux --arch=x64 --out=dist/ --overwrite --icon=./build/icons/icon.png",
     "dist:win": "electron-packager . iDO --platform=win32 --arch=x64 --out=dist/ --overwrite --icon=./build/icons/icon.ico",
     "dist:all": "npm run build && electron-builder --win nsis --linux AppImage",
-    "npm": "npm i && cd ./backend && npm i && cd .."
+    "npm": "npm i && cd ./backend && npm i && cd ..",
+    "deploy": "node deploy.cjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.4",
