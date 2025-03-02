@@ -71,7 +71,7 @@ console.log("Hashes saved to current.json");
   try {
     await runCommand("git add .");
     await runCommand('git commit -m "Deploy"');
-    await runCommand("git push");
+    await runCommand("git push origin HEAD:main");
     console.log("✅ Git push completed successfully!");
   } catch (err) {
     console.error("❌ Git process failed.");
