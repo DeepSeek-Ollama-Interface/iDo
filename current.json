@@ -35,7 +35,7 @@
   "backend/web_browsing/index.mjs": "8d0523c1c81f5b67b7f7173d7604501618bd2f53923fa67722654719a50c67a5",
   "build/icons/icon.ico": "eed8ebe5cf28b34c3655467bbc2afd5dc9a02401135842c75fc0ad5071176475",
   "build/icons/icon.png": "698b71c9f3562900d4adb9f1b8b307349d21e77f9afd5083c27a812cfaeaaa2d",
-  "deploy.cjs": "46449ca7dff85b550929af03222fc50b4e5b3e38f3cb1a8b687aa8d952a6cf71",
+  "deploy.cjs": "332bb007c6746e63dd6b6d3557278d3a3ca245d5d1d772c8f8a185e1f2ef21ca",
   "donate.png": "435c2ea88ac7429a8b8a50056f24e3aee5bb0ff596ffb03de8b8d91d5990eb7f",
   "electron/main.cjs": "23c8f5150e12417096ab0bc080eba9c82391276a74764216db6e5b0a25787236",
   "electron/preload.js": "bbd4005a5f8995bd99307d73bfc8fca1c0adebf650393260a3a70f81d2efcdb7",
