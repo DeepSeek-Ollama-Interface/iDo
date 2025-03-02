@@ -46,8 +46,7 @@
   "package.json": "e20cc7fd0c2365cd6c7711fffbfad1bafda0ed8b7b5b5146e5f7101b4926ad2e",
   "windows.png": "42ed72a9bda3dd345ef01bfdf523e2f1a9785b45cf2402a97c1b4ca0188cfa0d",
   "package-lock.json": "6916e27eb60e204fa79842c4f393c77e433f98c0951ba6b5cfa736ecc31a451c",
-  "src/icons/index.jsx": "3206358fa65229dbb8b4f24ab6857bb39084f76ac645655a1ed93b79efed8598",
-  "src/index.css": "38fbb66e55417173280cfa7fd1b6f047a13f49975d74bc56f6b4a9228d33ca37",
+  "src/App.jsx": "38fbb66e55417173280cfa7fd1b6f047a13f49975d74bc56f6b4a9228d33ca37",
   "src/main.jsx": "67e7b608c307e53150867c2729ecd3183d7a72ab86d765a55a27411430ce12a2",
   "src/components/ChatInput.jsx": "82ed18ee32cc22cb5dc497ddcfcca53d2f15854b57e47c03c17a2d7e65d65f9c",
   "src/components/ModelSelect.jsx": "9a413e41a47a0b8f435f1a5a88d11dca489c82f99cb3622872114594010b262c",
@@ -64,6 +63,7 @@
   "src/pages/Settings.jsx": "2ea0708f9433a9a7c48bf5fb5c4dddd2eab2788433cbe18f97a300535c3535c2",
   "src/icons/index.jsx": "3206358fa65229dbb8b4f24ab6857bb39084f76ac645655a1ed93b79efed8598",
   "src/ChatHandlersProvider.jsx": "eb5ddf295d792b0c9a9d901a7bdd3874178fed9c95953fc69c46219075ac9cf3",
+  "src/index.css": "1d3f2afc84b206ce0bcf7dbfaab9a7f9243f885ec1d48bedcef3f772a25630da",
   "src/assets/faviconDark.svg": "646a99f7f1f1e28887c254e2dd1a6ee3f55ca9467ba878153e827c9d5faf99b9",
   "src/assets/faviconDark.ico": "eed8ebe5cf28b34c3655467bbc2afd5dc9a02401135842c75fc0ad5071176475",
   "src/assets/faviconDark.png": "698b71c9f3562900d4adb9f1b8b307349d21e77f9afd5083c27a812cfaeaaa2d"
