@@ -15,6 +15,7 @@ export function ChatHandlersProvider({ children }) {
   const [isCoding, setIsCoding] = useState(false);
   const [showReasoningMessageHistory, setShowReasoningMessageHistory] = useState(false);
   const [selectedModel, setSelectedModel] = useState("ChatGPTapi~gpt-4o-mini");
+  const [isHoldingClick, setIsHoldingClick] = useState(false);
   const [selectedChatId, setSelectedChatId] = useState(() => {
     // Initialize from localStorage or create a new ID
     return localStorage.getItem("chatId") || uuidv4();
@@ -332,7 +333,9 @@ export function ChatHandlersProvider({ children }) {
         forceStreamEND,
         toggleThinkingMessages,
         scrollToBottom,
-        setShowReasoningMessageHistory
+        setShowReasoningMessageHistory,
+        isHoldingClick,
+        setIsHoldingClick
       }}
     >
       {children}

@@ -45,7 +45,7 @@ function UserSettingsContent() {
         ? { email, password, recaptcha: token }
         : { username, email, password, recaptcha: token };
 
-      const endpoint = isLoginForm ? "http://localhost:3001/login" : "http://localhost:3001/register";
+      const endpoint = isLoginForm ? "https://api.ido.vin:2086/login" : "https://api.ido.vin:2086/register";
       const response = await axios.post(endpoint, payload);
 
       setSuccess(true);

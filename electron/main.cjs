@@ -332,6 +332,10 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
+
+  // if(mainWindow){
+  //   mainWindow.openDevTools();
+  // }
 });
 
 app.on('window-all-closed', () => {

@@ -24,10 +24,15 @@ export default function Home() {
     forceStreamEND,
     toggleThinkingMessages,
     setShowReasoningMessageHistory,
+    setIsHoldingClick
   } = useChatHandlers();
 
   return (
-    <div className="h-screen w-full flex relative overflow-hidden">
+    <div 
+      className="h-screen w-full flex relative overflow-hidden"
+      onMouseDown={() => setIsHoldingClick(true)}
+      onMouseUp={() => setIsHoldingClick(false)}
+    >
       <div className="absolute top-0 left-0 z-[100]">
         <ChatHistory />
       </div>

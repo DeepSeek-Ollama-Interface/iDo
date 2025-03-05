@@ -11,7 +11,8 @@ export default function ChatMessages({
   setShowReasoningMessageHistory,
   isCoding,
   isLoading,
-  thinkingScrollRef
+  thinkingScrollRef,
+  setIsHoldingClick
 }) {
   useEffect(() => {
     console.dir(messages);

@@ -25,7 +25,7 @@ function CustomTitlebar() {
 
     const cpuUsageInterval = setInterval(() => {
       window.electron.getCpuUsage();
-    }, 500);
+    }, 1500);
 
     // Clean up event listeners on unmount
     return () => {

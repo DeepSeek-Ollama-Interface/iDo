@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useChatHandlers } from "../ChatHandlersProvider";
 
 const ChatHistory = () => {
-  const { loadChatById, selectedChatId } = useChatHandlers(); // Using context from provider
+  const { loadChatById, selectedChatId, isHoldingClick } = useChatHandlers(); // Using context from provider
   const [isOpen, setIsOpen] = useState(false);
   const [chatItems, setChatItems] = useState([]);
   const navRef = useRef(null); // Referință pentru navbar
@@ -117,14 +117,18 @@ const ChatHistory = () => {
 
   return (
     <div className="relative">
-      {/* Zona sensibilă la hover și butonul cu animație */}
-      <div className="fixed left-0 top-32 w-16 h-[72%] group flex items-center">
+
+      <div 
+          className="fixed left-0 w-16 h-[75%] group flex items-center"
+          style={{ top: `calc(var(--spacing) * 32)` }}
+        >
         <button
           ref={buttonRef}
           onClick={() => setIsOpen(!isOpen)}
-          className="absolute -right-1 cursor-pointer z-50 px-6 py-10
-          opacity-0 group-hover:opacity-100 transform translate-x-[-100%] group-hover:translate-x-0
-          transition-all duration-300 ease-in-out"
+          className={`absolute -right-1 cursor-pointer z-50 px-6 py-10
+            opacity-0 ${isHoldingClick ? "" : "group-hover:opacity-100"} transform translate-x-[-100%] ${
+              isHoldingClick ? "" : "group-hover:translate-x-0"
+            } transition-all duration-300 ease-in-out`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -140,7 +144,7 @@ const ChatHistory = () => {
         </button>
       </div>
 
-      {/* Sidebar Navigation */}
+
       {isOpen && (
         <nav
           ref={navRef}
@@ -184,7 +188,7 @@ const ChatHistory = () => {
               </button>
               
               {/* Action buttons */}
-              <div className="flex opacity-0 group-hover:opacity-100 transition-opacity space-x-1">
+              <div className="flex space-x-1">
                 <button
                   className="p-2 text-blue-400 hover:text-blue-300 hover:cursor-pointer"
                   onClick={(e) => {
