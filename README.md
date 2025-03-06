@@ -10,7 +10,7 @@
 
 **Ollama Deepseek Interface** is a powerful and intuitive desktop application that allows you to run **Deepseek-r1** locally on your PC. This interface enables you to access and manage your files effortlessly, while also providing you with an advanced **voice assistant** feature for smoother interaction. All functionality is optimized to ensure a seamless experience for users.
 
-![Website Preview](https://github.com/DeepSeek-Ollama-Interface/iDo/blob/main/Image.png?raw=true)
+![Website Preview](https://ido.vin/Image.png)
 
 ---
 
