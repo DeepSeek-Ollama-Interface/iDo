@@ -4,14 +4,14 @@
   "version": "1.0.3",
   "author": "https://ido.vin",
   "main": "./electron/main.cjs",
-  "type": "commonjs",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/DeepSeek-Ollama-Interface/iDo"
   },
   "scripts": {
     "lint": "eslint .",
-    "dev": "npm run build && cross-env NODE_ENV=development concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "dev": "cross-env NODE_ENV=development concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "build": "vite build",
     "viteonly": "vite wait-on http://localhost:5173",
     "electrononly": "electron .",
