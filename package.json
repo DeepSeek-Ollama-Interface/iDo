@@ -4,7 +4,7 @@
   "version": "1.0.3",
   "author": "https://ido.vin",
   "main": "./electron/main.cjs",
-  "type": "module",
+  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "https://github.com/DeepSeek-Ollama-Interface/iDo"
@@ -13,6 +13,8 @@
     "lint": "eslint .",
     "dev": "npm run build && cross-env NODE_ENV=development concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "build": "vite build",
+    "viteonly": "vite wait-on http://localhost:5173",
+    "electrononly": "electron .",
     "preview": "vite preview",
     "dist:linux": "npm run build && electron-packager . iDo --platform=linux --arch=x64 --out=dist/ --overwrite --icon=./build/icons/icon.png",
     "dist:win": "electron-packager . iDO --platform=win32 --arch=x64 --out=dist/ --overwrite --icon=./build/icons/icon.ico",
